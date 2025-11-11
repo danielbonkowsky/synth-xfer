@@ -63,8 +63,6 @@ from xdsl_smt.dialects.transfer import (
     XorOp,
 )
 
-# TODO need to impl SetHighBitsOp | SetLowBitsOp | ClearHighBitsOp | ClearLowBitsOp
-
 
 class _IRBuilderOp(Protocol):
     __self__: ir.IRBuilder
@@ -75,7 +73,7 @@ class _IRBuilderOp(Protocol):
 
 
 # TODO mlir_op map be owned by the lowerer
-_mlir_op_to_llvm: dict[type[Operation], _IRBuilderOp] = {  # type: ignore
+_llvm_intrinsics: dict[type[Operation], _IRBuilderOp] = {  # type: ignore
     # unary
     NegOp: ir.IRBuilder.neg,
     # binary
@@ -97,13 +95,6 @@ _mlir_op_to_llvm: dict[type[Operation], _IRBuilderOp] = {  # type: ignore
     ShlOp: ir.IRBuilder.shl,
     # # ternery
     SelectOp: ir.IRBuilder.select,
-    # TODO impl these ops
-    # "transfer.set_high_bits": ".setHighBits",
-    # "transfer.set_low_bits": ".setLowBits",
-    # "transfer.clear_high_bits": ".clearHighBits",
-    # "transfer.clear_low_bits": ".clearLowBits",
-    # "transfer.set_sign_bit": ".setSignBit",
-    # "transfer.clear_sign_bit": ".clearSignBit",
 }
 
 
@@ -223,7 +214,7 @@ class _OpConstraints:
         lhs_safe = b.select(ub_any, const_zero, lhs)
         rhs_safe = b.select(ub_any, const_one, rhs)
 
-        raw_llvm_op = _mlir_op_to_llvm[type(op)]
+        raw_llvm_op = _llvm_intrinsics[type(op)]
         raw = raw_llvm_op(b, lhs_safe, rhs_safe)
 
         return b.select(ub_any, chosen, raw)
@@ -444,7 +435,7 @@ class _LowerFuncToLLVM:
 
     @add_op.register
     def _(self, op: Operation) -> None:
-        llvm_op = _mlir_op_to_llvm[type(op)]
+        llvm_op = _llvm_intrinsics[type(op)]
 
         constraints = _OpConstraints(self.bw)
 
@@ -618,9 +609,28 @@ class _LowerFuncToLLVM:
     ) -> None:
         oprnds = self.operands(op)
         res_name = self.result_name(op)
+        high = isinstance(op, SetHighBitsOp) or isinstance(op, ClearHighBitsOp)
 
-        # TODO
-        self.ssa_map[op.results[0]] = oprnds[0]
+        n = oprnds[1]
+        x = oprnds[0]
+        allones = ir.Constant(ir.IntType(self.bw), ((2**self.bw) - 1))
+        c_zero = ir.Constant(ir.IntType(self.bw), 0)
+        c_bw = ir.Constant(ir.IntType(self.bw), self.bw)
+        c_bwm1 = ir.Constant(ir.IntType(self.bw), self.bw - 1)
+
+        ge = self.b.icmp_unsigned(">=", n, c_bw, name=f"{res_name}_ge")
+        safe_val = c_zero if high else c_bwm1
+        safe_n = self.b.select(ge, safe_val, n, name=f"{res_name}_safeN")
+        sh_op = self.b.lshr if high else self.b.shl
+        sh = sh_op(allones, safe_n, name=f"{res_name}_sh")
+
+        if isinstance(op, SetHighBitsOp) or isinstance(op, SetLowBitsOp):
+            inv = self.b.xor(sh, allones, name=f"{res_name}_inv")
+            mask = self.b.select(ge, allones, inv, name=f"{res_name}_mask")
+            self.ssa_map[op.results[0]] = self.b.or_(x, mask, name=res_name)  # type: ignore
+        elif isinstance(op, ClearHighBitsOp) or isinstance(op, ClearLowBitsOp):
+            mask = self.b.select(ge, c_zero, sh, name=f"{res_name}_mask")
+            self.ssa_map[op.results[0]] = self.b.and_(x, mask, name=res_name)  # type: ignore
 
     @add_op.register
     def _(self, op: CmpOp) -> None:
