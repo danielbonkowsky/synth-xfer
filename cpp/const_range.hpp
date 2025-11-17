@@ -31,12 +31,16 @@ public:
     os << '[' << x.lower().getZExtValue() << ", " << x.upper().getZExtValue()
        << ']';
 
-    if (isTop(x))
+    if (x.isTop())
       os << " (top)";
 
     return os << "\n";
   }
 
+  bool constexpr isTop() const noexcept {
+    return lower() == APInt<BW>::getZero() &&
+           upper() == APInt<BW>::getMaxValue();
+  }
   bool constexpr isBottom() const noexcept { return lower().ugt(upper()); }
 
   const constexpr ConstRange meet(const ConstRange &rhs) const noexcept {
@@ -58,6 +62,8 @@ public:
       return {};
 
     std::vector<APInt<BW>> res;
+    res.reserve(APIntOps::abdu(lower(), upper()).getZExtValue() + 1);
+
     for (APInt x = lower(); x.ule(upper()); x += 1) {
       res.push_back(x);
 
@@ -151,16 +157,6 @@ private:
   }
   [[nodiscard]] constexpr const APInt<BW> upper() const noexcept {
     return v[1];
-  }
-
-  // Make public/require in the concept
-  [[nodiscard]] constexpr bool isConstant() const noexcept {
-    return lower() == upper();
-  }
-
-  [[nodiscard]] constexpr const APInt<BW> getConstant() const noexcept {
-    assert(this.isConstant() && "Can't get constant if val is not const");
-    return lower();
   }
 };
 

@@ -36,12 +36,15 @@ public:
       os << " const: "
          << static_cast<std::uint64_t>(x.getConstant().getZExtValue());
 
-    if (isTop(x))
+    if (x.isTop())
       os << " (top)";
 
     return os << "\n";
   }
 
+  bool constexpr isTop() const noexcept {
+    return zero() == APInt<BW>::getZero() && one() == APInt<BW>::getZero();
+  }
   bool constexpr isBottom() const noexcept { return zero().intersects(one()); }
 
   const constexpr KnownBits meet(const KnownBits &rhs) const noexcept {
@@ -178,7 +181,6 @@ private:
   [[nodiscard]] constexpr const APInt<BW> zero() const noexcept { return v[0]; }
   [[nodiscard]] constexpr const APInt<BW> one() const noexcept { return v[1]; }
 
-  // TODO make public/require in the concept
   [[nodiscard]] constexpr bool isConstant() const noexcept {
     return zero().popcount() + one().popcount() == BW;
   }

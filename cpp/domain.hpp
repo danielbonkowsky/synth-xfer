@@ -34,6 +34,7 @@ concept Domain =
       { D<BW>::maxDist() } noexcept -> std::same_as<double>;
 
       // Instance methods
+      { d.isTop() } noexcept -> std::same_as<bool>;
       { d.isBottom() } noexcept -> std::same_as<bool>;
       { d.meet(d) } noexcept -> std::same_as<const D<BW>>;
       { d.join(d) } noexcept -> std::same_as<const D<BW>>;
@@ -62,12 +63,6 @@ constexpr bool operator!=(const D<BW> &lhs, const D<BW> &rhs) {
 }
 
 namespace DomainHelpers {
-template <template <std::size_t> class D, std::size_t BW>
-  requires Domain<D, BW>
-bool constexpr isTop(const D<BW> &d) {
-  return d == D<BW>::top();
-}
-
 template <template <std::size_t> class D, std::size_t BW>
   requires Domain<D, BW>
 bool constexpr isSuperset(const D<BW> &lhs, const D<BW> &rhs) {

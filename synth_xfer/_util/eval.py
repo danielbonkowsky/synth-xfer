@@ -2,6 +2,11 @@ from enum import Enum
 from typing import TYPE_CHECKING, Callable, cast
 
 from synth_xfer._eval_engine import (
+    ToEvalAntiRange4,
+    ToEvalAntiRange8,
+    ToEvalAntiRange16,
+    ToEvalAntiRange32,
+    ToEvalAntiRange64,
     ToEvalConstRange4,
     ToEvalConstRange8,
     ToEvalConstRange16,
@@ -12,6 +17,11 @@ from synth_xfer._eval_engine import (
     ToEvalKnownBits16,
     ToEvalKnownBits32,
     ToEvalKnownBits64,
+    enum_low_antirange_4,
+    enum_low_antirange_8,
+    enum_low_antirange_16,
+    enum_low_antirange_32,
+    enum_low_antirange_64,
     enum_low_constrange_4,
     enum_low_constrange_8,
     enum_low_constrange_16,
@@ -22,6 +32,11 @@ from synth_xfer._eval_engine import (
     enum_low_knownbits_16,
     enum_low_knownbits_32,
     enum_low_knownbits_64,
+    enum_mid_antirange_4,
+    enum_mid_antirange_8,
+    enum_mid_antirange_16,
+    enum_mid_antirange_32,
+    enum_mid_antirange_64,
     enum_mid_constrange_4,
     enum_mid_constrange_8,
     enum_mid_constrange_16,
@@ -32,6 +47,11 @@ from synth_xfer._eval_engine import (
     enum_mid_knownbits_16,
     enum_mid_knownbits_32,
     enum_mid_knownbits_64,
+    eval_antirange_4,
+    eval_antirange_8,
+    eval_antirange_16,
+    eval_antirange_32,
+    eval_antirange_64,
     eval_constrange_4,
     eval_constrange_8,
     eval_constrange_16,
@@ -55,8 +75,8 @@ if TYPE_CHECKING:
 class AbstractDomain(Enum):
     KnownBits = "KnownBits", 2
     ConstRange = "ConstRange", 2
+    AntiRange = "AntiRange", 2
     # TODO impl
-    # SConstRange = "SConstRange", 2
     # IntegerModulo = "IntegerModulo", 6
 
     vec_size: int
@@ -109,31 +129,41 @@ def setup_eval(
     constraint_fn_ptr = jit.get_fn_ptr(op_constraint.name) if op_constraint else None
 
     low_fns: dict[tuple[AbstractDomain, BW], Callable[[int, int | None], "ToEval"]] = {
-        (AbstractDomain.KnownBits, 4): enum_low_knownbits_4,
-        (AbstractDomain.KnownBits, 8): enum_low_knownbits_8,
-        (AbstractDomain.KnownBits, 16): enum_low_knownbits_16,
-        (AbstractDomain.KnownBits, 32): enum_low_knownbits_32,
-        (AbstractDomain.KnownBits, 64): enum_low_knownbits_64,
+        (AbstractDomain.AntiRange, 4): enum_low_antirange_4,
+        (AbstractDomain.AntiRange, 8): enum_low_antirange_8,
+        (AbstractDomain.AntiRange, 16): enum_low_antirange_16,
+        (AbstractDomain.AntiRange, 32): enum_low_antirange_32,
+        (AbstractDomain.AntiRange, 64): enum_low_antirange_64,
         (AbstractDomain.ConstRange, 4): enum_low_constrange_4,
         (AbstractDomain.ConstRange, 8): enum_low_constrange_8,
         (AbstractDomain.ConstRange, 16): enum_low_constrange_16,
         (AbstractDomain.ConstRange, 32): enum_low_constrange_32,
         (AbstractDomain.ConstRange, 64): enum_low_constrange_64,
+        (AbstractDomain.KnownBits, 4): enum_low_knownbits_4,
+        (AbstractDomain.KnownBits, 8): enum_low_knownbits_8,
+        (AbstractDomain.KnownBits, 16): enum_low_knownbits_16,
+        (AbstractDomain.KnownBits, 32): enum_low_knownbits_32,
+        (AbstractDomain.KnownBits, 64): enum_low_knownbits_64,
     }
 
     mid_fns: dict[
         tuple[AbstractDomain, BW], Callable[[int, int | None, int, int], "ToEval"]
     ] = {
-        (AbstractDomain.KnownBits, 4): enum_mid_knownbits_4,
-        (AbstractDomain.KnownBits, 8): enum_mid_knownbits_8,
-        (AbstractDomain.KnownBits, 16): enum_mid_knownbits_16,
-        (AbstractDomain.KnownBits, 32): enum_mid_knownbits_32,
-        (AbstractDomain.KnownBits, 64): enum_mid_knownbits_64,
+        (AbstractDomain.AntiRange, 4): enum_mid_antirange_4,
+        (AbstractDomain.AntiRange, 8): enum_mid_antirange_8,
+        (AbstractDomain.AntiRange, 16): enum_mid_antirange_16,
+        (AbstractDomain.AntiRange, 32): enum_mid_antirange_32,
+        (AbstractDomain.AntiRange, 64): enum_mid_antirange_64,
         (AbstractDomain.ConstRange, 4): enum_mid_constrange_4,
         (AbstractDomain.ConstRange, 8): enum_mid_constrange_8,
         (AbstractDomain.ConstRange, 16): enum_mid_constrange_16,
         (AbstractDomain.ConstRange, 32): enum_mid_constrange_32,
         (AbstractDomain.ConstRange, 64): enum_mid_constrange_64,
+        (AbstractDomain.KnownBits, 4): enum_mid_knownbits_4,
+        (AbstractDomain.KnownBits, 8): enum_mid_knownbits_8,
+        (AbstractDomain.KnownBits, 16): enum_mid_knownbits_16,
+        (AbstractDomain.KnownBits, 32): enum_mid_knownbits_32,
+        (AbstractDomain.KnownBits, 64): enum_mid_knownbits_64,
     }
 
     if samples:
@@ -157,6 +187,11 @@ def eval_transfer_func(
         ToEvalKnownBits16: cast(EvalFn, eval_knownbits_16),
         ToEvalKnownBits32: cast(EvalFn, eval_knownbits_32),
         ToEvalKnownBits64: cast(EvalFn, eval_knownbits_64),
+        ToEvalAntiRange4: cast(EvalFn, eval_antirange_4),
+        ToEvalAntiRange8: cast(EvalFn, eval_antirange_8),
+        ToEvalAntiRange16: cast(EvalFn, eval_antirange_16),
+        ToEvalAntiRange32: cast(EvalFn, eval_antirange_32),
+        ToEvalAntiRange64: cast(EvalFn, eval_antirange_64),
         ToEvalConstRange4: cast(EvalFn, eval_constrange_4),
         ToEvalConstRange8: cast(EvalFn, eval_constrange_8),
         ToEvalConstRange16: cast(EvalFn, eval_constrange_16),

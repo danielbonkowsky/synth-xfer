@@ -5,6 +5,7 @@
 #include <pybind11/stl.h>
 #include <utility>
 
+#include "anti_range.hpp"
 #include "const_range.hpp"
 #include "domain.hpp"
 #include "eval.hpp"
@@ -154,6 +155,11 @@ PYBIND11_MAKE_OPAQUE(ToEval<ConstRange, 8>);
 PYBIND11_MAKE_OPAQUE(ToEval<ConstRange, 16>);
 PYBIND11_MAKE_OPAQUE(ToEval<ConstRange, 32>);
 PYBIND11_MAKE_OPAQUE(ToEval<ConstRange, 64>);
+PYBIND11_MAKE_OPAQUE(ToEval<AntiRange, 4>);
+PYBIND11_MAKE_OPAQUE(ToEval<AntiRange, 8>);
+PYBIND11_MAKE_OPAQUE(ToEval<AntiRange, 16>);
+PYBIND11_MAKE_OPAQUE(ToEval<AntiRange, 32>);
+PYBIND11_MAKE_OPAQUE(ToEval<AntiRange, 64>);
 
 PYBIND11_MODULE(_eval_engine, m) {
   m.doc() = "Evaluation engine for synth_xfer";
@@ -169,4 +175,9 @@ PYBIND11_MODULE(_eval_engine, m) {
   register_domain<ConstRange, 16>(m);
   register_domain<ConstRange, 32>(m);
   register_domain<ConstRange, 64>(m);
+  register_domain<AntiRange, 4>(m);
+  register_domain<AntiRange, 8>(m);
+  register_domain<AntiRange, 16>(m);
+  register_domain<AntiRange, 32>(m);
+  register_domain<AntiRange, 64>(m);
 }

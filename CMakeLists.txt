@@ -14,6 +14,7 @@ set(SYNTH_XFER_SOURCES
   cpp/eval.hpp
   cpp/domain.hpp
   cpp/knownbits.hpp
+  cpp/anti_range.hpp
   cpp/const_range.hpp
 )
 
