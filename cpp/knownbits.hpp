@@ -20,6 +20,7 @@ public:
   static constexpr std::string name = "KnownBits";
 
   // ctor
+  constexpr KnownBits() : v{} {}
   constexpr KnownBits(const std::array<BV, arity> &x) : v{x} {}
 
   constexpr const BV &operator[](std::size_t i) const noexcept { return v[i]; }

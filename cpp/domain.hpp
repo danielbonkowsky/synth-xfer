@@ -13,6 +13,7 @@
 
 template <template <std::size_t> class D, std::size_t BW>
 concept Domain =
+    std::default_initializable<D<BW>> &&
     requires(const D<BW> d, const APInt<BW> &a, std::size_t i, std::ostream &os,
              std::mt19937 &rng) {
       typename D<BW>::BV;
@@ -63,6 +64,27 @@ constexpr bool operator!=(const D<BW> &lhs, const D<BW> &rhs) {
 }
 
 namespace DomainHelpers {
+
+template <template <std::size_t> class Dom, std::size_t ResBw,
+          std::size_t... BWs>
+  requires(Domain<Dom, ResBw> && (Domain<Dom, BWs> && ...))
+using ToEval = std::vector<std::tuple<Dom<BWs>..., Dom<ResBw>>>;
+
+// TODO specialized to arity 2 domains
+template <std::size_t BW>
+inline const constexpr std::array<std::uint64_t, 2>
+pack(const std::array<APInt<BW>, 2> &arr) {
+  return std::array<std::uint64_t, 2>{arr[0].getZExtValue(),
+                                      arr[1].getZExtValue()};
+}
+
+// TODO specialized to arity 2 domains
+template <std::size_t BW>
+inline const constexpr std::array<APInt<BW>, 2>
+unpack(const std::array<std::uint64_t, 2> &value) {
+  return {APInt<BW>{value[0]}, APInt<BW>{value[1]}};
+}
+
 template <template <std::size_t> class D, std::size_t BW>
   requires Domain<D, BW>
 bool constexpr isSuperset(const D<BW> &lhs, const D<BW> &rhs) {

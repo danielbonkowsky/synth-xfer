@@ -19,6 +19,7 @@ public:
   static constexpr std::string name = "UConstRange";
 
   // ctor
+  constexpr UConstRange() : v{} {}
   constexpr UConstRange(const std::array<BV, arity> &x) : v{x} {}
 
   constexpr const BV &operator[](std::size_t i) const noexcept { return v[i]; }

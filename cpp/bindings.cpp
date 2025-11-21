@@ -3,10 +3,10 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include <utility>
 
 #include "anti_range.hpp"
 #include "domain.hpp"
+#include "enum.hpp"
 #include "eval.hpp"
 #include "knownbits.hpp"
 #include "results.hpp"
@@ -48,19 +48,23 @@ void register_domain_class(py::module_ &m) {
   });
 }
 
-template <template <std::size_t> class D, std::size_t BW>
-  requires Domain<D, BW>
+template <template <std::size_t> class Dom, std::size_t ResBw,
+          std::size_t... BWs>
+  requires(Domain<Dom, ResBw> && (Domain<Dom, BWs> && ...))
 void register_enum_domain(py::module_ &m) {
-  std::string dname = D<BW>::name;
-  const std::string cls_name =
-      std::string("ToEval") + dname + std::to_string(BW);
+  using EvalVec = ToEval<Dom, ResBw, BWs...>;
+  using Row = std::tuple<Dom<BWs>..., Dom<ResBw>>;
+  using EnumT = EnumDomain<Dom, ResBw, BWs...>;
 
-  py::class_<ToEval<D, BW>>(m, cls_name.c_str())
-      .def("__len__", [](const ToEval<D, BW> &v) { return v.size(); })
+  std::string dname = Dom<ResBw>::name;
+  std::string cls_name = std::string("ToEval") + dname + std::to_string(ResBw);
+  ((cls_name += "_" + std::to_string(BWs)), ...);
+
+  py::class_<EvalVec>(m, cls_name.c_str())
+      .def("__len__", [](const EvalVec &v) { return v.size(); })
       .def(
           "__getitem__",
-          [](const ToEval<D, BW> &v,
-             std::size_t i) -> const std::tuple<D<BW>, D<BW>, D<BW>> & {
+          [](const EvalVec &v, std::size_t i) -> const Row & {
             if (i >= v.size())
               throw py::index_error();
             return v[i];
@@ -68,127 +72,151 @@ void register_enum_domain(py::module_ &m) {
           py::return_value_policy::reference_internal)
       .def(
           "__iter__",
-          [](const ToEval<D, BW> &v) {
+          [](const EvalVec &v) {
             return py::make_iterator(v.begin(), v.end());
           },
           py::keep_alive<0, 1>());
 
   std::transform(dname.begin(), dname.end(), dname.begin(), ::tolower);
-  const std::string fn_name = dname + "_" + std::to_string(BW);
 
-  m.def((std::string("enum_low_") + fn_name).c_str(),
-        [](const std::uintptr_t crtOpAddr,
-           const std::optional<std::uint64_t> opConFnAddr) {
+  std::string fn_name = dname + "_" + std::to_string(ResBw);
+  ((fn_name += "_" + std::to_string(BWs)), ...);
+
+  m.def(
+      ("enum_low_" + fn_name).c_str(),
+      [](std::uintptr_t crtOpAddr, std::optional<std::uintptr_t> opConFnAddr) {
+        py::gil_scoped_release release;
+        EnumT ed{crtOpAddr, opConFnAddr};
+        return std::make_unique<EvalVec>(ed.genLows());
+      },
+      py::arg("crtOpAddr"), py::arg("opConFnAddr") = py::none(),
+      py::return_value_policy::take_ownership);
+
+  m.def(("enum_mid_" + fn_name).c_str(),
+        [](std::uintptr_t crtOpAddr, std::optional<std::uintptr_t> opConFnAddr,
+           unsigned int num_lat_samples, unsigned int seed) {
           py::gil_scoped_release release;
-
-          return std::make_unique<ToEval<D, BW>>(
-              std::move(EnumDomain<D, BW>{crtOpAddr, opConFnAddr}.genLows()));
-        },
-        py::arg("crtOpAddr"), py::arg("opConFnAddr") = py::none(),
-        py::return_value_policy::take_ownership);
-
-  m.def((std::string("enum_mid_") + fn_name).c_str(),
-        [](const std::uintptr_t crtOpAddr,
-           const std::optional<std::uint64_t> opConFnAddr,
-           const unsigned int num_lat_samples, const unsigned int seed) {
-          py::gil_scoped_release release;
-
           std::mt19937 rng(seed);
-          return std::make_unique<ToEval<D, BW>>(
-              std::move(EnumDomain<D, BW>{crtOpAddr, opConFnAddr}.genMids(
-                  num_lat_samples, rng)));
+          EnumT ed{crtOpAddr, opConFnAddr};
+          return std::make_unique<EvalVec>(ed.genMids(num_lat_samples, rng));
         },
         py::arg("crtOpAddr"), py::arg("opConFnAddr") = py::none(),
         py::arg("num_lat_samples"), py::arg("seed"),
         py::return_value_policy::take_ownership);
 
-  m.def((std::string("enum_high_") + fn_name).c_str(),
-        [](const std::uintptr_t crtOpAddr,
-           const std::optional<std::uint64_t> opConFnAddr,
-           const unsigned int num_lat_samples,
-           const unsigned int num_crt_samples, const unsigned int seed) {
+  m.def(("enum_high_" + fn_name).c_str(),
+        [](std::uintptr_t crtOpAddr, std::optional<std::uintptr_t> opConFnAddr,
+           unsigned int num_lat_samples, unsigned int num_conc_samples,
+           unsigned int seed) {
           py::gil_scoped_release release;
-
           std::mt19937 rng(seed);
-          return std::make_unique<ToEval<D, BW>>(
-              std::move(EnumDomain<D, BW>{crtOpAddr, opConFnAddr}.genHighs(
-                  num_crt_samples, num_lat_samples, rng)));
+          EnumT ed{crtOpAddr, opConFnAddr};
+          return std::make_unique<EvalVec>(
+              ed.genHighs(num_lat_samples, num_conc_samples, rng));
         },
         py::arg("crtOpAddr"), py::arg("opConFnAddr") = py::none(),
-        py::arg("num_lat_samples"), py::arg("num_crt_samples"), py::arg("seed"),
-        py::return_value_policy::take_ownership);
+        py::arg("num_lat_samples"), py::arg("num_conc_samples"),
+        py::arg("seed"), py::return_value_policy::take_ownership);
 }
 
-template <template <std::size_t> class D, std::size_t BW>
-  requires Domain<D, BW>
+template <template <std::size_t> class Dom, std::size_t ResBw,
+          std::size_t... BWs>
+  requires(Domain<Dom, ResBw> && (Domain<Dom, BWs> && ...))
 void register_eval_domain(py::module_ &m) {
-  std::string dname = D<BW>::name;
-  std::transform(dname.begin(), dname.end(), dname.begin(), ::tolower);
-  const std::string fn_name =
-      std::string("eval_") + dname + "_" + std::to_string(BW);
+  using EvalVec = ToEval<Dom, ResBw, BWs...>;
+  using EvalT = Eval<Dom, ResBw, BWs...>;
+
+  std::string dname = Dom<ResBw>::name;
+  std::string dname_lower = dname;
+  std::transform(dname_lower.begin(), dname_lower.end(), dname_lower.begin(),
+                 ::tolower);
+
+  std::string fn_name = "eval_" + dname_lower + "_" + std::to_string(ResBw);
+  ((fn_name += "_" + std::to_string(BWs)), ...);
 
   m.def(
       fn_name.c_str(),
-      [](const ToEval<D, BW> &v, const std::vector<std::uintptr_t> xfers,
-         const std::vector<std::uintptr_t> bases) -> Results {
+      [](const EvalVec &v, const std::vector<std::uintptr_t> &xfers,
+         const std::vector<std::uintptr_t> &bases) -> Results {
         py::gil_scoped_release release;
-        return Eval<D, BW>{xfers, bases}.eval(v);
+        return EvalT{xfers, bases}.eval(v);
       },
       py::arg("to_eval"), py::arg("xfers"), py::arg("bases"));
 }
 
-template <template <std::size_t> class D, std::size_t BW>
-  requires Domain<D, BW>
-void register_domain(py::module_ &m) {
-  register_domain_class<D, BW>(m);
-  register_enum_domain<D, BW>(m);
-  register_eval_domain<D, BW>(m);
+template <template <std::size_t> class Dom, std::size_t ResBw,
+          std::size_t... BWs>
+  requires(Domain<Dom, ResBw> && (Domain<Dom, BWs> && ...))
+void register_enum_domain(py::module_ &m);
+
+template <template <std::size_t> class Dom, std::size_t ResBw,
+          std::size_t... BWs>
+  requires(Domain<Dom, ResBw> && (Domain<Dom, BWs> && ...))
+void register_eval_domain(py::module_ &m);
+
+template <template <std::size_t> class Dom, std::size_t BW, std::size_t N>
+  requires Domain<Dom, BW>
+void register_uniform_arity(py::module_ &m) {
+  [&]<std::size_t... Is>(std::index_sequence<Is...>) {
+    (void)sizeof...(Is); // silence warning if needed
+
+    register_enum_domain<Dom, BW, (static_cast<void>(Is), BW)...>(m);
+    register_eval_domain<Dom, BW, (static_cast<void>(Is), BW)...>(m);
+  }(std::make_index_sequence<N>{});
 }
 
-// Register domains and widths here
-PYBIND11_MAKE_OPAQUE(ToEval<KnownBits, 4>);
-PYBIND11_MAKE_OPAQUE(ToEval<KnownBits, 8>);
-PYBIND11_MAKE_OPAQUE(ToEval<KnownBits, 16>);
-PYBIND11_MAKE_OPAQUE(ToEval<KnownBits, 32>);
-PYBIND11_MAKE_OPAQUE(ToEval<KnownBits, 64>);
-PYBIND11_MAKE_OPAQUE(ToEval<UConstRange, 4>);
-PYBIND11_MAKE_OPAQUE(ToEval<UConstRange, 8>);
-PYBIND11_MAKE_OPAQUE(ToEval<UConstRange, 16>);
-PYBIND11_MAKE_OPAQUE(ToEval<UConstRange, 32>);
-PYBIND11_MAKE_OPAQUE(ToEval<UConstRange, 64>);
-PYBIND11_MAKE_OPAQUE(ToEval<SConstRange, 4>);
-PYBIND11_MAKE_OPAQUE(ToEval<SConstRange, 8>);
-PYBIND11_MAKE_OPAQUE(ToEval<SConstRange, 16>);
-PYBIND11_MAKE_OPAQUE(ToEval<SConstRange, 32>);
-PYBIND11_MAKE_OPAQUE(ToEval<SConstRange, 64>);
-PYBIND11_MAKE_OPAQUE(ToEval<AntiRange, 4>);
-PYBIND11_MAKE_OPAQUE(ToEval<AntiRange, 8>);
-PYBIND11_MAKE_OPAQUE(ToEval<AntiRange, 16>);
-PYBIND11_MAKE_OPAQUE(ToEval<AntiRange, 32>);
-PYBIND11_MAKE_OPAQUE(ToEval<AntiRange, 64>);
+template <template <std::size_t> class Dom, std::size_t BW>
+  requires Domain<Dom, BW>
+void register_domain(py::module_ &m) {
+  register_domain_class<Dom, BW>(m);
+
+  register_uniform_arity<Dom, BW, 1>(m);
+  register_uniform_arity<Dom, BW, 2>(m);
+  register_uniform_arity<Dom, BW, 3>(m);
+}
+
+template <template <std::size_t> class Dom, std::size_t... BWs>
+void register_domain_widths(py::module_ &m) {
+  (register_domain<Dom, BWs>(m), ...);
+}
+
+#define MAKE_OPAQUE_UNIFORM(DOM, BW)                                           \
+  PYBIND11_MAKE_OPAQUE(ToEval<DOM, BW, BW>);                                   \
+  PYBIND11_MAKE_OPAQUE(ToEval<DOM, BW, BW, BW>);                               \
+  PYBIND11_MAKE_OPAQUE(ToEval<DOM, BW, BW, BW, BW>);
+
+// Register domain classes here
+MAKE_OPAQUE_UNIFORM(KnownBits, 4);
+MAKE_OPAQUE_UNIFORM(KnownBits, 8);
+MAKE_OPAQUE_UNIFORM(KnownBits, 16);
+MAKE_OPAQUE_UNIFORM(KnownBits, 32);
+MAKE_OPAQUE_UNIFORM(KnownBits, 64);
+
+MAKE_OPAQUE_UNIFORM(UConstRange, 4);
+MAKE_OPAQUE_UNIFORM(UConstRange, 8);
+MAKE_OPAQUE_UNIFORM(UConstRange, 16);
+MAKE_OPAQUE_UNIFORM(UConstRange, 32);
+MAKE_OPAQUE_UNIFORM(UConstRange, 64);
+
+MAKE_OPAQUE_UNIFORM(SConstRange, 4);
+MAKE_OPAQUE_UNIFORM(SConstRange, 8);
+MAKE_OPAQUE_UNIFORM(SConstRange, 16);
+MAKE_OPAQUE_UNIFORM(SConstRange, 32);
+MAKE_OPAQUE_UNIFORM(SConstRange, 64);
+
+MAKE_OPAQUE_UNIFORM(AntiRange, 4);
+MAKE_OPAQUE_UNIFORM(AntiRange, 8);
+MAKE_OPAQUE_UNIFORM(AntiRange, 16);
+MAKE_OPAQUE_UNIFORM(AntiRange, 32);
+MAKE_OPAQUE_UNIFORM(AntiRange, 64);
 
 PYBIND11_MODULE(_eval_engine, m) {
   m.doc() = "Evaluation engine for synth_xfer";
 
   register_results_class(m);
-  register_domain<KnownBits, 4>(m);
-  register_domain<KnownBits, 8>(m);
-  register_domain<KnownBits, 16>(m);
-  register_domain<KnownBits, 32>(m);
-  register_domain<KnownBits, 64>(m);
-  register_domain<UConstRange, 4>(m);
-  register_domain<UConstRange, 8>(m);
-  register_domain<UConstRange, 16>(m);
-  register_domain<UConstRange, 32>(m);
-  register_domain<UConstRange, 64>(m);
-  register_domain<SConstRange, 4>(m);
-  register_domain<SConstRange, 8>(m);
-  register_domain<SConstRange, 16>(m);
-  register_domain<SConstRange, 32>(m);
-  register_domain<SConstRange, 64>(m);
-  register_domain<AntiRange, 4>(m);
-  register_domain<AntiRange, 8>(m);
-  register_domain<AntiRange, 16>(m);
-  register_domain<AntiRange, 32>(m);
-  register_domain<AntiRange, 64>(m);
+
+  register_domain_widths<KnownBits, 4, 8, 16, 32, 64>(m);
+  register_domain_widths<UConstRange, 4, 8, 16, 32, 64>(m);
+  register_domain_widths<SConstRange, 4, 8, 16, 32, 64>(m);
+  register_domain_widths<AntiRange, 4, 8, 16, 32, 64>(m);
 }

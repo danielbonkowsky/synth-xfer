@@ -19,6 +19,7 @@ public:
   static constexpr std::string name = "AntiRange";
 
   // ctor
+  constexpr AntiRange() : v{} {}
   constexpr AntiRange(const std::array<BV, arity> &x)
       : AntiRange(x, /*normalize=*/true) {}
 

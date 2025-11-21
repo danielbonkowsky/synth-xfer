@@ -12,10 +12,12 @@ set(SYNTH_XFER_SOURCES
   cpp/apint.hpp
   cpp/bindings.cpp
   cpp/eval.hpp
+  cpp/enum.hpp
   cpp/domain.hpp
   cpp/knownbits.hpp
   cpp/anti_range.hpp
   cpp/uconst_range.hpp
+  cpp/sconst_range.hpp
 )
 
 pybind11_add_module(_eval_engine ${SYNTH_XFER_SOURCES})
