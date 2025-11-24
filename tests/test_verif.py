@@ -43,6 +43,7 @@ def test_verif_ucr_nop():
         res, _ = verify_function(bw, xfer_mlir, [], helpers, 3)
         assert res is True
 
+
 def test_verif_scr_nop():
     conc_add_f = PROJ_DIR / "mlir" / "Operations" / "Nop.mlir"
     helpers = get_helper_funcs(conc_add_f, AbstractDomain.SConstRange)

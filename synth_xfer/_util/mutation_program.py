@@ -29,7 +29,9 @@ class MutationProgram:
     def ops(self):
         return list(self.func.body.block.ops)
 
-    def get_modifiable_operations(self, only_live: bool = True) -> list[tuple[Operation, int]]:
+    def get_modifiable_operations(
+        self, only_live: bool = True
+    ) -> list[tuple[Operation, int]]:
         """
         Get live operations when only_live = True, otherwise return all operations in the main body
         """

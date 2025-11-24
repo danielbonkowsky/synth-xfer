@@ -174,7 +174,6 @@ def no_constraint(_val: SSAValue) -> bool:
     return False
 
 
-
 optimize_operands_selection: dict[type[Operation], Callable[[SSAValue], bool]] = {
     # Transfer operations
     NegOp: is_zero_or_allones,
@@ -205,8 +204,9 @@ True value means we should not use that SSAValue as the operand
 """
 
 
-
-optimize_complex_operands_selection: dict[type[Operation], list[Callable[[SSAValue], bool]]] = {
+optimize_complex_operands_selection: dict[
+    type[Operation], list[Callable[[SSAValue], bool]]
+] = {
     SelectOp: [is_constant_bool, no_constraint, no_constraint],
     SetLowBitsOp: [is_one_or_allones, is_zero_or_allones],
     SetHighBitsOp: [is_allones, is_zero_or_allones],
@@ -451,7 +451,7 @@ class SynthesizerContext:
             val = self.select_operand(operands_vals[0], self.get_constraint(result_type))
             if val is None:
                 return None
-            return result_type(val)  # pyright: ignore [reportCallIssue]
+            return result_type(val)
         elif self.skip_trivial and result_type in optimize_complex_operands_selection:
             constraint1, constraint2 = optimize_complex_operands_selection[result_type]
             val1, val2 = self.select_two_operand(
@@ -527,7 +527,9 @@ class SynthesizerContext:
                 new_constraint = lambda val=SSAValue: (
                     constraint(val) and val != op.operands[1 - ith]
                 )
-        val = self.select_operand(vals, constraint if new_constraint is None else new_constraint)
+        val = self.select_operand(
+            vals, constraint if new_constraint is None else new_constraint
+        )
         if val is None:
             return False
         op.operands[ith] = val

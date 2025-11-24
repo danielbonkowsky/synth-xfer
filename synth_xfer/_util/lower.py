@@ -314,7 +314,7 @@ class _LowerFuncToLLVM:
         self.llvm_mod = llvm_mod
 
         self.b = ir.IRBuilder(llvm_fn.append_basic_block(name="entry"))
-        self.ssa_map = dict(zip(mlir_fn.args, llvm_fn.args))  # type: ignore
+        self.ssa_map = dict(zip(mlir_fn.args, llvm_fn.args))
 
         [self.add_op(op) for op in mlir_fn.walk() if not isinstance(op, FuncOp)]
 
@@ -467,7 +467,7 @@ class _LowerFuncToLLVM:
         elif isinstance(op, GetBitWidthOp):
             val = self.bw
         elif isinstance(op, Constant):
-            val: int = op.value.value.data  # type: ignore
+            val: int = op.value.value.data
         elif isinstance(op, ConstantOp):
             assert isinstance(op.value.type, IntegerType)
             ty = ir.IntType(op.value.type.width.data)

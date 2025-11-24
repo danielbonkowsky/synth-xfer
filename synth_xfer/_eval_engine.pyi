@@ -5,10 +5,8 @@ from typing import Literal, Never, Union, overload
 
 BW = Literal[4, 8, 16, 32, 64]
 
-
 class Results:
     def __str__(self) -> str: ...
-
 
 # =========================
 # KnownBits classes
@@ -21,14 +19,12 @@ class KnownBits4:
     def bw() -> int: ...
     def __str__(self) -> str: ...
 
-
 class KnownBits8:
     @staticmethod
     def arity() -> int: ...
     @staticmethod
     def bw() -> int: ...
     def __str__(self) -> str: ...
-
 
 class KnownBits16:
     @staticmethod
@@ -37,7 +33,6 @@ class KnownBits16:
     def bw() -> int: ...
     def __str__(self) -> str: ...
 
-
 class KnownBits32:
     @staticmethod
     def arity() -> int: ...
@@ -45,14 +40,12 @@ class KnownBits32:
     def bw() -> int: ...
     def __str__(self) -> str: ...
 
-
 class KnownBits64:
     @staticmethod
     def arity() -> int: ...
     @staticmethod
     def bw() -> int: ...
     def __str__(self) -> str: ...
-
 
 # KnownBits row types: (inputs..., result)
 
@@ -76,7 +69,6 @@ KnownBits64UnaryRow = tuple[KnownBits64, KnownBits64]
 KnownBits64BinaryRow = tuple[KnownBits64, KnownBits64, KnownBits64]
 KnownBits64TernaryRow = tuple[KnownBits64, KnownBits64, KnownBits64, KnownBits64]
 
-
 class ToEvalKnownBits4_4(Sequence[KnownBits4UnaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -84,7 +76,6 @@ class ToEvalKnownBits4_4(Sequence[KnownBits4UnaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[KnownBits4UnaryRow]: ...
-
 
 class ToEvalKnownBits4_4_4(Sequence[KnownBits4BinaryRow]):
     def __len__(self) -> int: ...
@@ -94,7 +85,6 @@ class ToEvalKnownBits4_4_4(Sequence[KnownBits4BinaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[KnownBits4BinaryRow]: ...
 
-
 class ToEvalKnownBits4_4_4_4(Sequence[KnownBits4TernaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -102,7 +92,6 @@ class ToEvalKnownBits4_4_4_4(Sequence[KnownBits4TernaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[KnownBits4TernaryRow]: ...
-
 
 class ToEvalKnownBits8_8(Sequence[KnownBits8UnaryRow]):
     def __len__(self) -> int: ...
@@ -112,7 +101,6 @@ class ToEvalKnownBits8_8(Sequence[KnownBits8UnaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[KnownBits8UnaryRow]: ...
 
-
 class ToEvalKnownBits8_8_8(Sequence[KnownBits8BinaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -120,7 +108,6 @@ class ToEvalKnownBits8_8_8(Sequence[KnownBits8BinaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[KnownBits8BinaryRow]: ...
-
 
 class ToEvalKnownBits8_8_8_8(Sequence[KnownBits8TernaryRow]):
     def __len__(self) -> int: ...
@@ -130,7 +117,6 @@ class ToEvalKnownBits8_8_8_8(Sequence[KnownBits8TernaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[KnownBits8TernaryRow]: ...
 
-
 class ToEvalKnownBits16_16(Sequence[KnownBits16UnaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -138,7 +124,6 @@ class ToEvalKnownBits16_16(Sequence[KnownBits16UnaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[KnownBits16UnaryRow]: ...
-
 
 class ToEvalKnownBits16_16_16(Sequence[KnownBits16BinaryRow]):
     def __len__(self) -> int: ...
@@ -148,7 +133,6 @@ class ToEvalKnownBits16_16_16(Sequence[KnownBits16BinaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[KnownBits16BinaryRow]: ...
 
-
 class ToEvalKnownBits16_16_16_16(Sequence[KnownBits16TernaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -156,7 +140,6 @@ class ToEvalKnownBits16_16_16_16(Sequence[KnownBits16TernaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[KnownBits16TernaryRow]: ...
-
 
 class ToEvalKnownBits32_32(Sequence[KnownBits32UnaryRow]):
     def __len__(self) -> int: ...
@@ -166,7 +149,6 @@ class ToEvalKnownBits32_32(Sequence[KnownBits32UnaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[KnownBits32UnaryRow]: ...
 
-
 class ToEvalKnownBits32_32_32(Sequence[KnownBits32BinaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -174,7 +156,6 @@ class ToEvalKnownBits32_32_32(Sequence[KnownBits32BinaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[KnownBits32BinaryRow]: ...
-
 
 class ToEvalKnownBits32_32_32_32(Sequence[KnownBits32TernaryRow]):
     def __len__(self) -> int: ...
@@ -184,7 +165,6 @@ class ToEvalKnownBits32_32_32_32(Sequence[KnownBits32TernaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[KnownBits32TernaryRow]: ...
 
-
 class ToEvalKnownBits64_64(Sequence[KnownBits64UnaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -192,7 +172,6 @@ class ToEvalKnownBits64_64(Sequence[KnownBits64UnaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[KnownBits64UnaryRow]: ...
-
 
 class ToEvalKnownBits64_64_64(Sequence[KnownBits64BinaryRow]):
     def __len__(self) -> int: ...
@@ -202,7 +181,6 @@ class ToEvalKnownBits64_64_64(Sequence[KnownBits64BinaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[KnownBits64BinaryRow]: ...
 
-
 class ToEvalKnownBits64_64_64_64(Sequence[KnownBits64TernaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -210,7 +188,6 @@ class ToEvalKnownBits64_64_64_64(Sequence[KnownBits64TernaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[KnownBits64TernaryRow]: ...
-
 
 KnownBitsToEval = Union[
     ToEvalKnownBits4_4,
@@ -230,7 +207,6 @@ KnownBitsToEval = Union[
     ToEvalKnownBits64_64_64_64,
 ]
 
-
 # KnownBits functions
 
 def enum_low_knownbits_4_4(
@@ -242,7 +218,6 @@ def enum_low_knownbits_4_4_4(
 def enum_low_knownbits_4_4_4_4(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalKnownBits4_4_4_4: ...
-
 def enum_low_knownbits_8_8(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalKnownBits8_8: ...
@@ -252,7 +227,6 @@ def enum_low_knownbits_8_8_8(
 def enum_low_knownbits_8_8_8_8(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalKnownBits8_8_8_8: ...
-
 def enum_low_knownbits_16_16(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalKnownBits16_16: ...
@@ -262,7 +236,6 @@ def enum_low_knownbits_16_16_16(
 def enum_low_knownbits_16_16_16_16(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalKnownBits16_16_16_16: ...
-
 def enum_low_knownbits_32_32(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalKnownBits32_32: ...
@@ -272,7 +245,6 @@ def enum_low_knownbits_32_32_32(
 def enum_low_knownbits_32_32_32_32(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalKnownBits32_32_32_32: ...
-
 def enum_low_knownbits_64_64(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalKnownBits64_64: ...
@@ -282,140 +254,96 @@ def enum_low_knownbits_64_64_64(
 def enum_low_knownbits_64_64_64_64(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalKnownBits64_64_64_64: ...
-
-
 def enum_mid_knownbits_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalKnownBits4_4: ...
 def enum_mid_knownbits_4_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalKnownBits4_4_4: ...
 def enum_mid_knownbits_4_4_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalKnownBits4_4_4_4: ...
-
 def enum_mid_knownbits_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalKnownBits8_8: ...
 def enum_mid_knownbits_8_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalKnownBits8_8_8: ...
 def enum_mid_knownbits_8_8_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalKnownBits8_8_8_8: ...
-
 def enum_mid_knownbits_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalKnownBits16_16: ...
 def enum_mid_knownbits_16_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalKnownBits16_16_16: ...
 def enum_mid_knownbits_16_16_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalKnownBits16_16_16_16: ...
-
 def enum_mid_knownbits_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalKnownBits32_32: ...
 def enum_mid_knownbits_32_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalKnownBits32_32_32: ...
 def enum_mid_knownbits_32_32_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalKnownBits32_32_32_32: ...
-
 def enum_mid_knownbits_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalKnownBits64_64: ...
 def enum_mid_knownbits_64_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalKnownBits64_64_64: ...
 def enum_mid_knownbits_64_64_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalKnownBits64_64_64_64: ...
-
-
 def enum_high_knownbits_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalKnownBits4_4: ...
 def enum_high_knownbits_4_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalKnownBits4_4_4: ...
 def enum_high_knownbits_4_4_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalKnownBits4_4_4_4: ...
-
 def enum_high_knownbits_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalKnownBits8_8: ...
 def enum_high_knownbits_8_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalKnownBits8_8_8: ...
 def enum_high_knownbits_8_8_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalKnownBits8_8_8_8: ...
-
 def enum_high_knownbits_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalKnownBits16_16: ...
 def enum_high_knownbits_16_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalKnownBits16_16_16: ...
 def enum_high_knownbits_16_16_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalKnownBits16_16_16_16: ...
-
 def enum_high_knownbits_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalKnownBits32_32: ...
 def enum_high_knownbits_32_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalKnownBits32_32_32: ...
 def enum_high_knownbits_32_32_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalKnownBits32_32_32_32: ...
-
 def enum_high_knownbits_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalKnownBits64_64: ...
 def enum_high_knownbits_64_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalKnownBits64_64_64: ...
 def enum_high_knownbits_64_64_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalKnownBits64_64_64_64: ...
-
-
 def eval_knownbits_4_4(
     to_eval: ToEvalKnownBits4_4, xfers: list[int], bases: list[int]
 ) -> Results: ...
@@ -425,7 +353,6 @@ def eval_knownbits_4_4_4(
 def eval_knownbits_4_4_4_4(
     to_eval: ToEvalKnownBits4_4_4_4, xfers: list[int], bases: list[int]
 ) -> Results: ...
-
 def eval_knownbits_8_8(
     to_eval: ToEvalKnownBits8_8, xfers: list[int], bases: list[int]
 ) -> Results: ...
@@ -435,7 +362,6 @@ def eval_knownbits_8_8_8(
 def eval_knownbits_8_8_8_8(
     to_eval: ToEvalKnownBits8_8_8_8, xfers: list[int], bases: list[int]
 ) -> Results: ...
-
 def eval_knownbits_16_16(
     to_eval: ToEvalKnownBits16_16, xfers: list[int], bases: list[int]
 ) -> Results: ...
@@ -445,7 +371,6 @@ def eval_knownbits_16_16_16(
 def eval_knownbits_16_16_16_16(
     to_eval: ToEvalKnownBits16_16_16_16, xfers: list[int], bases: list[int]
 ) -> Results: ...
-
 def eval_knownbits_32_32(
     to_eval: ToEvalKnownBits32_32, xfers: list[int], bases: list[int]
 ) -> Results: ...
@@ -455,7 +380,6 @@ def eval_knownbits_32_32_32(
 def eval_knownbits_32_32_32_32(
     to_eval: ToEvalKnownBits32_32_32_32, xfers: list[int], bases: list[int]
 ) -> Results: ...
-
 def eval_knownbits_64_64(
     to_eval: ToEvalKnownBits64_64, xfers: list[int], bases: list[int]
 ) -> Results: ...
@@ -465,7 +389,6 @@ def eval_knownbits_64_64_64(
 def eval_knownbits_64_64_64_64(
     to_eval: ToEvalKnownBits64_64_64_64, xfers: list[int], bases: list[int]
 ) -> Results: ...
-
 
 # =========================
 # UConstRange classes
@@ -478,14 +401,12 @@ class UConstRange4:
     def bw() -> int: ...
     def __str__(self) -> str: ...
 
-
 class UConstRange8:
     @staticmethod
     def arity() -> int: ...
     @staticmethod
     def bw() -> int: ...
     def __str__(self) -> str: ...
-
 
 class UConstRange16:
     @staticmethod
@@ -494,7 +415,6 @@ class UConstRange16:
     def bw() -> int: ...
     def __str__(self) -> str: ...
 
-
 class UConstRange32:
     @staticmethod
     def arity() -> int: ...
@@ -502,14 +422,12 @@ class UConstRange32:
     def bw() -> int: ...
     def __str__(self) -> str: ...
 
-
 class UConstRange64:
     @staticmethod
     def arity() -> int: ...
     @staticmethod
     def bw() -> int: ...
     def __str__(self) -> str: ...
-
 
 UConstRange4UnaryRow = tuple[UConstRange4, UConstRange4]
 UConstRange4BinaryRow = tuple[UConstRange4, UConstRange4, UConstRange4]
@@ -521,16 +439,21 @@ UConstRange8TernaryRow = tuple[UConstRange8, UConstRange8, UConstRange8, UConstR
 
 UConstRange16UnaryRow = tuple[UConstRange16, UConstRange16]
 UConstRange16BinaryRow = tuple[UConstRange16, UConstRange16, UConstRange16]
-UConstRange16TernaryRow = tuple[UConstRange16, UConstRange16, UConstRange16, UConstRange16]
+UConstRange16TernaryRow = tuple[
+    UConstRange16, UConstRange16, UConstRange16, UConstRange16
+]
 
 UConstRange32UnaryRow = tuple[UConstRange32, UConstRange32]
 UConstRange32BinaryRow = tuple[UConstRange32, UConstRange32, UConstRange32]
-UConstRange32TernaryRow = tuple[UConstRange32, UConstRange32, UConstRange32, UConstRange32]
+UConstRange32TernaryRow = tuple[
+    UConstRange32, UConstRange32, UConstRange32, UConstRange32
+]
 
 UConstRange64UnaryRow = tuple[UConstRange64, UConstRange64]
 UConstRange64BinaryRow = tuple[UConstRange64, UConstRange64, UConstRange64]
-UConstRange64TernaryRow = tuple[UConstRange64, UConstRange64, UConstRange64, UConstRange64]
-
+UConstRange64TernaryRow = tuple[
+    UConstRange64, UConstRange64, UConstRange64, UConstRange64
+]
 
 class ToEvalUConstRange4_4(Sequence[UConstRange4UnaryRow]):
     def __len__(self) -> int: ...
@@ -540,7 +463,6 @@ class ToEvalUConstRange4_4(Sequence[UConstRange4UnaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[UConstRange4UnaryRow]: ...
 
-
 class ToEvalUConstRange4_4_4(Sequence[UConstRange4BinaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -548,7 +470,6 @@ class ToEvalUConstRange4_4_4(Sequence[UConstRange4BinaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[UConstRange4BinaryRow]: ...
-
 
 class ToEvalUConstRange4_4_4_4(Sequence[UConstRange4TernaryRow]):
     def __len__(self) -> int: ...
@@ -558,7 +479,6 @@ class ToEvalUConstRange4_4_4_4(Sequence[UConstRange4TernaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[UConstRange4TernaryRow]: ...
 
-
 class ToEvalUConstRange8_8(Sequence[UConstRange8UnaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -566,7 +486,6 @@ class ToEvalUConstRange8_8(Sequence[UConstRange8UnaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[UConstRange8UnaryRow]: ...
-
 
 class ToEvalUConstRange8_8_8(Sequence[UConstRange8BinaryRow]):
     def __len__(self) -> int: ...
@@ -576,7 +495,6 @@ class ToEvalUConstRange8_8_8(Sequence[UConstRange8BinaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[UConstRange8BinaryRow]: ...
 
-
 class ToEvalUConstRange8_8_8_8(Sequence[UConstRange8TernaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -584,7 +502,6 @@ class ToEvalUConstRange8_8_8_8(Sequence[UConstRange8TernaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[UConstRange8TernaryRow]: ...
-
 
 class ToEvalUConstRange16_16(Sequence[UConstRange16UnaryRow]):
     def __len__(self) -> int: ...
@@ -594,7 +511,6 @@ class ToEvalUConstRange16_16(Sequence[UConstRange16UnaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[UConstRange16UnaryRow]: ...
 
-
 class ToEvalUConstRange16_16_16(Sequence[UConstRange16BinaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -602,7 +518,6 @@ class ToEvalUConstRange16_16_16(Sequence[UConstRange16BinaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[UConstRange16BinaryRow]: ...
-
 
 class ToEvalUConstRange16_16_16_16(Sequence[UConstRange16TernaryRow]):
     def __len__(self) -> int: ...
@@ -612,7 +527,6 @@ class ToEvalUConstRange16_16_16_16(Sequence[UConstRange16TernaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[UConstRange16TernaryRow]: ...
 
-
 class ToEvalUConstRange32_32(Sequence[UConstRange32UnaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -620,7 +534,6 @@ class ToEvalUConstRange32_32(Sequence[UConstRange32UnaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[UConstRange32UnaryRow]: ...
-
 
 class ToEvalUConstRange32_32_32(Sequence[UConstRange32BinaryRow]):
     def __len__(self) -> int: ...
@@ -630,7 +543,6 @@ class ToEvalUConstRange32_32_32(Sequence[UConstRange32BinaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[UConstRange32BinaryRow]: ...
 
-
 class ToEvalUConstRange32_32_32_32(Sequence[UConstRange32TernaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -638,7 +550,6 @@ class ToEvalUConstRange32_32_32_32(Sequence[UConstRange32TernaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[UConstRange32TernaryRow]: ...
-
 
 class ToEvalUConstRange64_64(Sequence[UConstRange64UnaryRow]):
     def __len__(self) -> int: ...
@@ -648,7 +559,6 @@ class ToEvalUConstRange64_64(Sequence[UConstRange64UnaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[UConstRange64UnaryRow]: ...
 
-
 class ToEvalUConstRange64_64_64(Sequence[UConstRange64BinaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -657,7 +567,6 @@ class ToEvalUConstRange64_64_64(Sequence[UConstRange64BinaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[UConstRange64BinaryRow]: ...
 
-
 class ToEvalUConstRange64_64_64_64(Sequence[UConstRange64TernaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -665,7 +574,6 @@ class ToEvalUConstRange64_64_64_64(Sequence[UConstRange64TernaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[UConstRange64TernaryRow]: ...
-
 
 UConstRangeToEval = Union[
     ToEvalUConstRange4_4,
@@ -685,7 +593,6 @@ UConstRangeToEval = Union[
     ToEvalUConstRange64_64_64_64,
 ]
 
-
 def enum_low_uconstrange_4_4(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalUConstRange4_4: ...
@@ -695,7 +602,6 @@ def enum_low_uconstrange_4_4_4(
 def enum_low_uconstrange_4_4_4_4(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalUConstRange4_4_4_4: ...
-
 def enum_low_uconstrange_8_8(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalUConstRange8_8: ...
@@ -705,7 +611,6 @@ def enum_low_uconstrange_8_8_8(
 def enum_low_uconstrange_8_8_8_8(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalUConstRange8_8_8_8: ...
-
 def enum_low_uconstrange_16_16(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalUConstRange16_16: ...
@@ -715,7 +620,6 @@ def enum_low_uconstrange_16_16_16(
 def enum_low_uconstrange_16_16_16_16(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalUConstRange16_16_16_16: ...
-
 def enum_low_uconstrange_32_32(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalUConstRange32_32: ...
@@ -725,7 +629,6 @@ def enum_low_uconstrange_32_32_32(
 def enum_low_uconstrange_32_32_32_32(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalUConstRange32_32_32_32: ...
-
 def enum_low_uconstrange_64_64(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalUConstRange64_64: ...
@@ -735,140 +638,96 @@ def enum_low_uconstrange_64_64_64(
 def enum_low_uconstrange_64_64_64_64(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalUConstRange64_64_64_64: ...
-
-
 def enum_mid_uconstrange_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalUConstRange4_4: ...
 def enum_mid_uconstrange_4_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalUConstRange4_4_4: ...
 def enum_mid_uconstrange_4_4_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalUConstRange4_4_4_4: ...
-
 def enum_mid_uconstrange_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalUConstRange8_8: ...
 def enum_mid_uconstrange_8_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalUConstRange8_8_8: ...
 def enum_mid_uconstrange_8_8_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalUConstRange8_8_8_8: ...
-
 def enum_mid_uconstrange_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalUConstRange16_16: ...
 def enum_mid_uconstrange_16_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalUConstRange16_16_16: ...
 def enum_mid_uconstrange_16_16_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalUConstRange16_16_16_16: ...
-
 def enum_mid_uconstrange_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalUConstRange32_32: ...
 def enum_mid_uconstrange_32_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalUConstRange32_32_32: ...
 def enum_mid_uconstrange_32_32_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalUConstRange32_32_32_32: ...
-
 def enum_mid_uconstrange_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalUConstRange64_64: ...
 def enum_mid_uconstrange_64_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalUConstRange64_64_64: ...
 def enum_mid_uconstrange_64_64_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalUConstRange64_64_64_64: ...
-
-
 def enum_high_uconstrange_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalUConstRange4_4: ...
 def enum_high_uconstrange_4_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalUConstRange4_4_4: ...
 def enum_high_uconstrange_4_4_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalUConstRange4_4_4_4: ...
-
 def enum_high_uconstrange_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalUConstRange8_8: ...
 def enum_high_uconstrange_8_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalUConstRange8_8_8: ...
 def enum_high_uconstrange_8_8_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalUConstRange8_8_8_8: ...
-
 def enum_high_uconstrange_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalUConstRange16_16: ...
 def enum_high_uconstrange_16_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalUConstRange16_16_16: ...
 def enum_high_uconstrange_16_16_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalUConstRange16_16_16_16: ...
-
 def enum_high_uconstrange_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalUConstRange32_32: ...
 def enum_high_uconstrange_32_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalUConstRange32_32_32: ...
 def enum_high_uconstrange_32_32_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalUConstRange32_32_32_32: ...
-
 def enum_high_uconstrange_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalUConstRange64_64: ...
 def enum_high_uconstrange_64_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalUConstRange64_64_64: ...
 def enum_high_uconstrange_64_64_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalUConstRange64_64_64_64: ...
-
-
 def eval_uconstrange_4_4(
     to_eval: ToEvalUConstRange4_4, xfers: list[int], bases: list[int]
 ) -> Results: ...
@@ -878,7 +737,6 @@ def eval_uconstrange_4_4_4(
 def eval_uconstrange_4_4_4_4(
     to_eval: ToEvalUConstRange4_4_4_4, xfers: list[int], bases: list[int]
 ) -> Results: ...
-
 def eval_uconstrange_8_8(
     to_eval: ToEvalUConstRange8_8, xfers: list[int], bases: list[int]
 ) -> Results: ...
@@ -888,7 +746,6 @@ def eval_uconstrange_8_8_8(
 def eval_uconstrange_8_8_8_8(
     to_eval: ToEvalUConstRange8_8_8_8, xfers: list[int], bases: list[int]
 ) -> Results: ...
-
 def eval_uconstrange_16_16(
     to_eval: ToEvalUConstRange16_16, xfers: list[int], bases: list[int]
 ) -> Results: ...
@@ -898,7 +755,6 @@ def eval_uconstrange_16_16_16(
 def eval_uconstrange_16_16_16_16(
     to_eval: ToEvalUConstRange16_16_16_16, xfers: list[int], bases: list[int]
 ) -> Results: ...
-
 def eval_uconstrange_32_32(
     to_eval: ToEvalUConstRange32_32, xfers: list[int], bases: list[int]
 ) -> Results: ...
@@ -908,7 +764,6 @@ def eval_uconstrange_32_32_32(
 def eval_uconstrange_32_32_32_32(
     to_eval: ToEvalUConstRange32_32_32_32, xfers: list[int], bases: list[int]
 ) -> Results: ...
-
 def eval_uconstrange_64_64(
     to_eval: ToEvalUConstRange64_64, xfers: list[int], bases: list[int]
 ) -> Results: ...
@@ -918,7 +773,6 @@ def eval_uconstrange_64_64_64(
 def eval_uconstrange_64_64_64_64(
     to_eval: ToEvalUConstRange64_64_64_64, xfers: list[int], bases: list[int]
 ) -> Results: ...
-
 
 # =========================
 # SConstRange classes
@@ -931,14 +785,12 @@ class SConstRange4:
     def bw() -> int: ...
     def __str__(self) -> str: ...
 
-
 class SConstRange8:
     @staticmethod
     def arity() -> int: ...
     @staticmethod
     def bw() -> int: ...
     def __str__(self) -> str: ...
-
 
 class SConstRange16:
     @staticmethod
@@ -947,7 +799,6 @@ class SConstRange16:
     def bw() -> int: ...
     def __str__(self) -> str: ...
 
-
 class SConstRange32:
     @staticmethod
     def arity() -> int: ...
@@ -955,14 +806,12 @@ class SConstRange32:
     def bw() -> int: ...
     def __str__(self) -> str: ...
 
-
 class SConstRange64:
     @staticmethod
     def arity() -> int: ...
     @staticmethod
     def bw() -> int: ...
     def __str__(self) -> str: ...
-
 
 SConstRange4UnaryRow = tuple[SConstRange4, SConstRange4]
 SConstRange4BinaryRow = tuple[SConstRange4, SConstRange4, SConstRange4]
@@ -974,16 +823,21 @@ SConstRange8TernaryRow = tuple[SConstRange8, SConstRange8, SConstRange8, SConstR
 
 SConstRange16UnaryRow = tuple[SConstRange16, SConstRange16]
 SConstRange16BinaryRow = tuple[SConstRange16, SConstRange16, SConstRange16]
-SConstRange16TernaryRow = tuple[SConstRange16, SConstRange16, SConstRange16, SConstRange16]
+SConstRange16TernaryRow = tuple[
+    SConstRange16, SConstRange16, SConstRange16, SConstRange16
+]
 
 SConstRange32UnaryRow = tuple[SConstRange32, SConstRange32]
 SConstRange32BinaryRow = tuple[SConstRange32, SConstRange32, SConstRange32]
-SConstRange32TernaryRow = tuple[SConstRange32, SConstRange32, SConstRange32, SConstRange32]
+SConstRange32TernaryRow = tuple[
+    SConstRange32, SConstRange32, SConstRange32, SConstRange32
+]
 
 SConstRange64UnaryRow = tuple[SConstRange64, SConstRange64]
 SConstRange64BinaryRow = tuple[SConstRange64, SConstRange64, SConstRange64]
-SConstRange64TernaryRow = tuple[SConstRange64, SConstRange64, SConstRange64, SConstRange64]
-
+SConstRange64TernaryRow = tuple[
+    SConstRange64, SConstRange64, SConstRange64, SConstRange64
+]
 
 class ToEvalSConstRange4_4(Sequence[SConstRange4UnaryRow]):
     def __len__(self) -> int: ...
@@ -993,7 +847,6 @@ class ToEvalSConstRange4_4(Sequence[SConstRange4UnaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[SConstRange4UnaryRow]: ...
 
-
 class ToEvalSConstRange4_4_4(Sequence[SConstRange4BinaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -1001,7 +854,6 @@ class ToEvalSConstRange4_4_4(Sequence[SConstRange4BinaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[SConstRange4BinaryRow]: ...
-
 
 class ToEvalSConstRange4_4_4_4(Sequence[SConstRange4TernaryRow]):
     def __len__(self) -> int: ...
@@ -1011,7 +863,6 @@ class ToEvalSConstRange4_4_4_4(Sequence[SConstRange4TernaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[SConstRange4TernaryRow]: ...
 
-
 class ToEvalSConstRange8_8(Sequence[SConstRange8UnaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -1019,7 +870,6 @@ class ToEvalSConstRange8_8(Sequence[SConstRange8UnaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[SConstRange8UnaryRow]: ...
-
 
 class ToEvalSConstRange8_8_8(Sequence[SConstRange8BinaryRow]):
     def __len__(self) -> int: ...
@@ -1029,7 +879,6 @@ class ToEvalSConstRange8_8_8(Sequence[SConstRange8BinaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[SConstRange8BinaryRow]: ...
 
-
 class ToEvalSConstRange8_8_8_8(Sequence[SConstRange8TernaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -1037,7 +886,6 @@ class ToEvalSConstRange8_8_8_8(Sequence[SConstRange8TernaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[SConstRange8TernaryRow]: ...
-
 
 class ToEvalSConstRange16_16(Sequence[SConstRange16UnaryRow]):
     def __len__(self) -> int: ...
@@ -1047,7 +895,6 @@ class ToEvalSConstRange16_16(Sequence[SConstRange16UnaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[SConstRange16UnaryRow]: ...
 
-
 class ToEvalSConstRange16_16_16(Sequence[SConstRange16BinaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -1055,7 +902,6 @@ class ToEvalSConstRange16_16_16(Sequence[SConstRange16BinaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[SConstRange16BinaryRow]: ...
-
 
 class ToEvalSConstRange16_16_16_16(Sequence[SConstRange16TernaryRow]):
     def __len__(self) -> int: ...
@@ -1065,7 +911,6 @@ class ToEvalSConstRange16_16_16_16(Sequence[SConstRange16TernaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[SConstRange16TernaryRow]: ...
 
-
 class ToEvalSConstRange32_32(Sequence[SConstRange32UnaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -1073,7 +918,6 @@ class ToEvalSConstRange32_32(Sequence[SConstRange32UnaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[SConstRange32UnaryRow]: ...
-
 
 class ToEvalSConstRange32_32_32(Sequence[SConstRange32BinaryRow]):
     def __len__(self) -> int: ...
@@ -1083,7 +927,6 @@ class ToEvalSConstRange32_32_32(Sequence[SConstRange32BinaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[SConstRange32BinaryRow]: ...
 
-
 class ToEvalSConstRange32_32_32_32(Sequence[SConstRange32TernaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -1091,7 +934,6 @@ class ToEvalSConstRange32_32_32_32(Sequence[SConstRange32TernaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[SConstRange32TernaryRow]: ...
-
 
 class ToEvalSConstRange64_64(Sequence[SConstRange64UnaryRow]):
     def __len__(self) -> int: ...
@@ -1101,7 +943,6 @@ class ToEvalSConstRange64_64(Sequence[SConstRange64UnaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[SConstRange64UnaryRow]: ...
 
-
 class ToEvalSConstRange64_64_64(Sequence[SConstRange64BinaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -1110,7 +951,6 @@ class ToEvalSConstRange64_64_64(Sequence[SConstRange64BinaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[SConstRange64BinaryRow]: ...
 
-
 class ToEvalSConstRange64_64_64_64(Sequence[SConstRange64TernaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -1118,7 +958,6 @@ class ToEvalSConstRange64_64_64_64(Sequence[SConstRange64TernaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[SConstRange64TernaryRow]: ...
-
 
 SConstRangeToEval = Union[
     ToEvalSConstRange4_4,
@@ -1138,7 +977,6 @@ SConstRangeToEval = Union[
     ToEvalSConstRange64_64_64_64,
 ]
 
-
 def enum_low_sconstrange_4_4(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalSConstRange4_4: ...
@@ -1148,7 +986,6 @@ def enum_low_sconstrange_4_4_4(
 def enum_low_sconstrange_4_4_4_4(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalSConstRange4_4_4_4: ...
-
 def enum_low_sconstrange_8_8(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalSConstRange8_8: ...
@@ -1158,7 +995,6 @@ def enum_low_sconstrange_8_8_8(
 def enum_low_sconstrange_8_8_8_8(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalSConstRange8_8_8_8: ...
-
 def enum_low_sconstrange_16_16(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalSConstRange16_16: ...
@@ -1168,7 +1004,6 @@ def enum_low_sconstrange_16_16_16(
 def enum_low_sconstrange_16_16_16_16(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalSConstRange16_16_16_16: ...
-
 def enum_low_sconstrange_32_32(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalSConstRange32_32: ...
@@ -1178,7 +1013,6 @@ def enum_low_sconstrange_32_32_32(
 def enum_low_sconstrange_32_32_32_32(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalSConstRange32_32_32_32: ...
-
 def enum_low_sconstrange_64_64(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalSConstRange64_64: ...
@@ -1188,140 +1022,96 @@ def enum_low_sconstrange_64_64_64(
 def enum_low_sconstrange_64_64_64_64(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalSConstRange64_64_64_64: ...
-
-
 def enum_mid_sconstrange_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalSConstRange4_4: ...
 def enum_mid_sconstrange_4_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalSConstRange4_4_4: ...
 def enum_mid_sconstrange_4_4_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalSConstRange4_4_4_4: ...
-
 def enum_mid_sconstrange_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalSConstRange8_8: ...
 def enum_mid_sconstrange_8_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalSConstRange8_8_8: ...
 def enum_mid_sconstrange_8_8_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalSConstRange8_8_8_8: ...
-
 def enum_mid_sconstrange_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalSConstRange16_16: ...
 def enum_mid_sconstrange_16_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalSConstRange16_16_16: ...
 def enum_mid_sconstrange_16_16_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalSConstRange16_16_16_16: ...
-
 def enum_mid_sconstrange_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalSConstRange32_32: ...
 def enum_mid_sconstrange_32_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalSConstRange32_32_32: ...
 def enum_mid_sconstrange_32_32_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalSConstRange32_32_32_32: ...
-
 def enum_mid_sconstrange_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalSConstRange64_64: ...
 def enum_mid_sconstrange_64_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalSConstRange64_64_64: ...
 def enum_mid_sconstrange_64_64_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalSConstRange64_64_64_64: ...
-
-
 def enum_high_sconstrange_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalSConstRange4_4: ...
 def enum_high_sconstrange_4_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalSConstRange4_4_4: ...
 def enum_high_sconstrange_4_4_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalSConstRange4_4_4_4: ...
-
 def enum_high_sconstrange_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalSConstRange8_8: ...
 def enum_high_sconstrange_8_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalSConstRange8_8_8: ...
 def enum_high_sconstrange_8_8_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalSConstRange8_8_8_8: ...
-
 def enum_high_sconstrange_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalSConstRange16_16: ...
 def enum_high_sconstrange_16_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalSConstRange16_16_16: ...
 def enum_high_sconstrange_16_16_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalSConstRange16_16_16_16: ...
-
 def enum_high_sconstrange_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalSConstRange32_32: ...
 def enum_high_sconstrange_32_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalSConstRange32_32_32: ...
 def enum_high_sconstrange_32_32_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalSConstRange32_32_32_32: ...
-
 def enum_high_sconstrange_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalSConstRange64_64: ...
 def enum_high_sconstrange_64_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalSConstRange64_64_64: ...
 def enum_high_sconstrange_64_64_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalSConstRange64_64_64_64: ...
-
-
 def eval_sconstrange_4_4(
     to_eval: ToEvalSConstRange4_4, xfers: list[int], bases: list[int]
 ) -> Results: ...
@@ -1331,7 +1121,6 @@ def eval_sconstrange_4_4_4(
 def eval_sconstrange_4_4_4_4(
     to_eval: ToEvalSConstRange4_4_4_4, xfers: list[int], bases: list[int]
 ) -> Results: ...
-
 def eval_sconstrange_8_8(
     to_eval: ToEvalSConstRange8_8, xfers: list[int], bases: list[int]
 ) -> Results: ...
@@ -1341,7 +1130,6 @@ def eval_sconstrange_8_8_8(
 def eval_sconstrange_8_8_8_8(
     to_eval: ToEvalSConstRange8_8_8_8, xfers: list[int], bases: list[int]
 ) -> Results: ...
-
 def eval_sconstrange_16_16(
     to_eval: ToEvalSConstRange16_16, xfers: list[int], bases: list[int]
 ) -> Results: ...
@@ -1351,7 +1139,6 @@ def eval_sconstrange_16_16_16(
 def eval_sconstrange_16_16_16_16(
     to_eval: ToEvalSConstRange16_16_16_16, xfers: list[int], bases: list[int]
 ) -> Results: ...
-
 def eval_sconstrange_32_32(
     to_eval: ToEvalSConstRange32_32, xfers: list[int], bases: list[int]
 ) -> Results: ...
@@ -1361,7 +1148,6 @@ def eval_sconstrange_32_32_32(
 def eval_sconstrange_32_32_32_32(
     to_eval: ToEvalSConstRange32_32_32_32, xfers: list[int], bases: list[int]
 ) -> Results: ...
-
 def eval_sconstrange_64_64(
     to_eval: ToEvalSConstRange64_64, xfers: list[int], bases: list[int]
 ) -> Results: ...
@@ -1371,7 +1157,6 @@ def eval_sconstrange_64_64_64(
 def eval_sconstrange_64_64_64_64(
     to_eval: ToEvalSConstRange64_64_64_64, xfers: list[int], bases: list[int]
 ) -> Results: ...
-
 
 # =========================
 # AntiRange classes
@@ -1384,14 +1169,12 @@ class AntiRange4:
     def bw() -> int: ...
     def __str__(self) -> str: ...
 
-
 class AntiRange8:
     @staticmethod
     def arity() -> int: ...
     @staticmethod
     def bw() -> int: ...
     def __str__(self) -> str: ...
-
 
 class AntiRange16:
     @staticmethod
@@ -1400,7 +1183,6 @@ class AntiRange16:
     def bw() -> int: ...
     def __str__(self) -> str: ...
 
-
 class AntiRange32:
     @staticmethod
     def arity() -> int: ...
@@ -1408,14 +1190,12 @@ class AntiRange32:
     def bw() -> int: ...
     def __str__(self) -> str: ...
 
-
 class AntiRange64:
     @staticmethod
     def arity() -> int: ...
     @staticmethod
     def bw() -> int: ...
     def __str__(self) -> str: ...
-
 
 AntiRange4UnaryRow = tuple[AntiRange4, AntiRange4]
 AntiRange4BinaryRow = tuple[AntiRange4, AntiRange4, AntiRange4]
@@ -1437,7 +1217,6 @@ AntiRange64UnaryRow = tuple[AntiRange64, AntiRange64]
 AntiRange64BinaryRow = tuple[AntiRange64, AntiRange64, AntiRange64]
 AntiRange64TernaryRow = tuple[AntiRange64, AntiRange64, AntiRange64, AntiRange64]
 
-
 class ToEvalAntiRange4_4(Sequence[AntiRange4UnaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -1445,7 +1224,6 @@ class ToEvalAntiRange4_4(Sequence[AntiRange4UnaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[AntiRange4UnaryRow]: ...
-
 
 class ToEvalAntiRange4_4_4(Sequence[AntiRange4BinaryRow]):
     def __len__(self) -> int: ...
@@ -1455,7 +1233,6 @@ class ToEvalAntiRange4_4_4(Sequence[AntiRange4BinaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[AntiRange4BinaryRow]: ...
 
-
 class ToEvalAntiRange4_4_4_4(Sequence[AntiRange4TernaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -1463,7 +1240,6 @@ class ToEvalAntiRange4_4_4_4(Sequence[AntiRange4TernaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[AntiRange4TernaryRow]: ...
-
 
 class ToEvalAntiRange8_8(Sequence[AntiRange8UnaryRow]):
     def __len__(self) -> int: ...
@@ -1473,7 +1249,6 @@ class ToEvalAntiRange8_8(Sequence[AntiRange8UnaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[AntiRange8UnaryRow]: ...
 
-
 class ToEvalAntiRange8_8_8(Sequence[AntiRange8BinaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -1481,7 +1256,6 @@ class ToEvalAntiRange8_8_8(Sequence[AntiRange8BinaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[AntiRange8BinaryRow]: ...
-
 
 class ToEvalAntiRange8_8_8_8(Sequence[AntiRange8TernaryRow]):
     def __len__(self) -> int: ...
@@ -1491,7 +1265,6 @@ class ToEvalAntiRange8_8_8_8(Sequence[AntiRange8TernaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[AntiRange8TernaryRow]: ...
 
-
 class ToEvalAntiRange16_16(Sequence[AntiRange16UnaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -1499,7 +1272,6 @@ class ToEvalAntiRange16_16(Sequence[AntiRange16UnaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[AntiRange16UnaryRow]: ...
-
 
 class ToEvalAntiRange16_16_16(Sequence[AntiRange16BinaryRow]):
     def __len__(self) -> int: ...
@@ -1509,7 +1281,6 @@ class ToEvalAntiRange16_16_16(Sequence[AntiRange16BinaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[AntiRange16BinaryRow]: ...
 
-
 class ToEvalAntiRange16_16_16_16(Sequence[AntiRange16TernaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -1517,7 +1288,6 @@ class ToEvalAntiRange16_16_16_16(Sequence[AntiRange16TernaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[AntiRange16TernaryRow]: ...
-
 
 class ToEvalAntiRange32_32(Sequence[AntiRange32UnaryRow]):
     def __len__(self) -> int: ...
@@ -1527,7 +1297,6 @@ class ToEvalAntiRange32_32(Sequence[AntiRange32UnaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[AntiRange32UnaryRow]: ...
 
-
 class ToEvalAntiRange32_32_32(Sequence[AntiRange32BinaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -1535,7 +1304,6 @@ class ToEvalAntiRange32_32_32(Sequence[AntiRange32BinaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[AntiRange32BinaryRow]: ...
-
 
 class ToEvalAntiRange32_32_32_32(Sequence[AntiRange32TernaryRow]):
     def __len__(self) -> int: ...
@@ -1545,7 +1313,6 @@ class ToEvalAntiRange32_32_32_32(Sequence[AntiRange32TernaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[AntiRange32TernaryRow]: ...
 
-
 class ToEvalAntiRange64_64(Sequence[AntiRange64UnaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -1553,7 +1320,6 @@ class ToEvalAntiRange64_64(Sequence[AntiRange64UnaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[AntiRange64UnaryRow]: ...
-
 
 class ToEvalAntiRange64_64_64(Sequence[AntiRange64BinaryRow]):
     def __len__(self) -> int: ...
@@ -1563,7 +1329,6 @@ class ToEvalAntiRange64_64_64(Sequence[AntiRange64BinaryRow]):
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[AntiRange64BinaryRow]: ...
 
-
 class ToEvalAntiRange64_64_64_64(Sequence[AntiRange64TernaryRow]):
     def __len__(self) -> int: ...
     @overload
@@ -1571,7 +1336,6 @@ class ToEvalAntiRange64_64_64_64(Sequence[AntiRange64TernaryRow]):
     @overload
     def __getitem__(self, index: slice) -> Never: ...
     def __iter__(self) -> Iterator[AntiRange64TernaryRow]: ...
-
 
 AntiRangeToEval = Union[
     ToEvalAntiRange4_4,
@@ -1591,7 +1355,6 @@ AntiRangeToEval = Union[
     ToEvalAntiRange64_64_64_64,
 ]
 
-
 def enum_low_antirange_4_4(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalAntiRange4_4: ...
@@ -1601,7 +1364,6 @@ def enum_low_antirange_4_4_4(
 def enum_low_antirange_4_4_4_4(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalAntiRange4_4_4_4: ...
-
 def enum_low_antirange_8_8(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalAntiRange8_8: ...
@@ -1611,7 +1373,6 @@ def enum_low_antirange_8_8_8(
 def enum_low_antirange_8_8_8_8(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalAntiRange8_8_8_8: ...
-
 def enum_low_antirange_16_16(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalAntiRange16_16: ...
@@ -1621,7 +1382,6 @@ def enum_low_antirange_16_16_16(
 def enum_low_antirange_16_16_16_16(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalAntiRange16_16_16_16: ...
-
 def enum_low_antirange_32_32(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalAntiRange32_32: ...
@@ -1631,7 +1391,6 @@ def enum_low_antirange_32_32_32(
 def enum_low_antirange_32_32_32_32(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalAntiRange32_32_32_32: ...
-
 def enum_low_antirange_64_64(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalAntiRange64_64: ...
@@ -1641,140 +1400,96 @@ def enum_low_antirange_64_64_64(
 def enum_low_antirange_64_64_64_64(
     crtOpAddr: int, opConAddr: int | None
 ) -> ToEvalAntiRange64_64_64_64: ...
-
-
 def enum_mid_antirange_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalAntiRange4_4: ...
 def enum_mid_antirange_4_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalAntiRange4_4_4: ...
 def enum_mid_antirange_4_4_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalAntiRange4_4_4_4: ...
-
 def enum_mid_antirange_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalAntiRange8_8: ...
 def enum_mid_antirange_8_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalAntiRange8_8_8: ...
 def enum_mid_antirange_8_8_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalAntiRange8_8_8_8: ...
-
 def enum_mid_antirange_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalAntiRange16_16: ...
 def enum_mid_antirange_16_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalAntiRange16_16_16: ...
 def enum_mid_antirange_16_16_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalAntiRange16_16_16_16: ...
-
 def enum_mid_antirange_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalAntiRange32_32: ...
 def enum_mid_antirange_32_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalAntiRange32_32_32: ...
 def enum_mid_antirange_32_32_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalAntiRange32_32_32_32: ...
-
 def enum_mid_antirange_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalAntiRange64_64: ...
 def enum_mid_antirange_64_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalAntiRange64_64_64: ...
 def enum_mid_antirange_64_64_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, seed: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, seed: int
 ) -> ToEvalAntiRange64_64_64_64: ...
-
-
 def enum_high_antirange_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalAntiRange4_4: ...
 def enum_high_antirange_4_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalAntiRange4_4_4: ...
 def enum_high_antirange_4_4_4_4(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalAntiRange4_4_4_4: ...
-
 def enum_high_antirange_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalAntiRange8_8: ...
 def enum_high_antirange_8_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalAntiRange8_8_8: ...
 def enum_high_antirange_8_8_8_8(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalAntiRange8_8_8_8: ...
-
 def enum_high_antirange_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalAntiRange16_16: ...
 def enum_high_antirange_16_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalAntiRange16_16_16: ...
 def enum_high_antirange_16_16_16_16(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalAntiRange16_16_16_16: ...
-
 def enum_high_antirange_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalAntiRange32_32: ...
 def enum_high_antirange_32_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalAntiRange32_32_32: ...
 def enum_high_antirange_32_32_32_32(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalAntiRange32_32_32_32: ...
-
 def enum_high_antirange_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalAntiRange64_64: ...
 def enum_high_antirange_64_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalAntiRange64_64_64: ...
 def enum_high_antirange_64_64_64_64(
-    crtOpAddr: int, opConFnAddr: int | None,
-    num_lat_samples: int, num_conc_samples: int
+    crtOpAddr: int, opConFnAddr: int | None, num_lat_samples: int, num_conc_samples: int
 ) -> ToEvalAntiRange64_64_64_64: ...
-
-
 def eval_antirange_4_4(
     to_eval: ToEvalAntiRange4_4, xfers: list[int], bases: list[int]
 ) -> Results: ...
@@ -1784,7 +1499,6 @@ def eval_antirange_4_4_4(
 def eval_antirange_4_4_4_4(
     to_eval: ToEvalAntiRange4_4_4_4, xfers: list[int], bases: list[int]
 ) -> Results: ...
-
 def eval_antirange_8_8(
     to_eval: ToEvalAntiRange8_8, xfers: list[int], bases: list[int]
 ) -> Results: ...
@@ -1794,7 +1508,6 @@ def eval_antirange_8_8_8(
 def eval_antirange_8_8_8_8(
     to_eval: ToEvalAntiRange8_8_8_8, xfers: list[int], bases: list[int]
 ) -> Results: ...
-
 def eval_antirange_16_16(
     to_eval: ToEvalAntiRange16_16, xfers: list[int], bases: list[int]
 ) -> Results: ...
@@ -1804,7 +1517,6 @@ def eval_antirange_16_16_16(
 def eval_antirange_16_16_16_16(
     to_eval: ToEvalAntiRange16_16_16_16, xfers: list[int], bases: list[int]
 ) -> Results: ...
-
 def eval_antirange_32_32(
     to_eval: ToEvalAntiRange32_32, xfers: list[int], bases: list[int]
 ) -> Results: ...
@@ -1814,7 +1526,6 @@ def eval_antirange_32_32_32(
 def eval_antirange_32_32_32_32(
     to_eval: ToEvalAntiRange32_32_32_32, xfers: list[int], bases: list[int]
 ) -> Results: ...
-
 def eval_antirange_64_64(
     to_eval: ToEvalAntiRange64_64, xfers: list[int], bases: list[int]
 ) -> Results: ...
@@ -1824,7 +1535,6 @@ def eval_antirange_64_64_64(
 def eval_antirange_64_64_64_64(
     to_eval: ToEvalAntiRange64_64_64_64, xfers: list[int], bases: list[int]
 ) -> Results: ...
-
 
 # =========================
 # Big union of all ToEval
