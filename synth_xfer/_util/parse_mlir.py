@@ -23,11 +23,9 @@ _ctx.load_dialect(Transfer)
 @runtime_checkable
 class _Readable(Protocol):
     @property
-    def name(self) -> str:
-        ...
+    def name(self) -> str: ...
 
-    def read_text(self) -> str:
-        ...
+    def read_text(self) -> str: ...
 
 
 def parse_mlir(p: _Readable) -> Operation:

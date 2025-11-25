@@ -100,8 +100,7 @@ class MCMCSampler:
         """
         old_op = self.current.ops[idx]
         valid_operands = {
-            ty: self.current.get_valid_operands(idx, ty)
-            for ty in [INT_T, BOOL_T, BINT_T]
+            ty: self.current.get_valid_operands(idx, ty) for ty in [INT_T, BOOL_T, BINT_T]
         }
         new_op = None
         while new_op is None:
