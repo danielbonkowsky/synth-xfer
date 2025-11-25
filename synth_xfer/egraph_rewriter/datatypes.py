@@ -1,177 +1,144 @@
 from __future__ import annotations
-from typing import Callable
-from egglog import birewrite, i64Like, StringLike, Expr, rewrite, ruleset, vars_, method
 
+from typing import Callable
+
+from egglog import Expr, StringLike, birewrite, i64Like, method, rewrite, ruleset, vars_
+from xdsl.ir import Operation
 from xdsl_smt.dialects.transfer import (
     AddOp,
     AndOp,
-    GetBitWidthOp,
-    NegOp,
-    OrOp,
-    SubOp,
-    XorOp,
-    MulOp,
-    ShlOp,
     AShrOp,
-    LShrOp,
-    UDivOp,
-    SDivOp,
-    URemOp,
-    SRemOp,
-    UMinOp,
-    UMaxOp,
-    SMinOp,
-    SMaxOp,
-    SetHighBitsOp,
-    SetLowBitsOp,
     ClearHighBitsOp,
     ClearLowBitsOp,
-    SetSignBitOp,
     ClearSignBitOp,
+    CmpOp,
     CountLOneOp,
     CountLZeroOp,
     CountROneOp,
     CountRZeroOp,
+    GetBitWidthOp,
+    LShrOp,
+    MulOp,
+    NegOp,
+    OrOp,
+    SDivOp,
     SelectOp,
-    CmpOp,
+    SetHighBitsOp,
+    SetLowBitsOp,
+    SetSignBitOp,
+    ShlOp,
+    SMaxOp,
+    SMinOp,
+    SRemOp,
+    SubOp,
+    UDivOp,
+    UMaxOp,
+    UMinOp,
+    URemOp,
+    XorOp,
 )
-from xdsl.ir import Operation
 
 
 class BV(Expr):
     @method(cost=0)
-    def __init__(self, value: i64Like) -> None:
-        ...
+    def __init__(self, value: i64Like) -> None: ...
 
     @method(cost=0)
     @classmethod
-    def var(cls, name: StringLike) -> BV:
-        ...
+    def var(cls, name: StringLike) -> BV: ...
 
     # For some reason, the override for __or__ does not work
     # def __or__(self, other: Num) -> Num: ...
 
     @classmethod
-    def Or(cls, lhs: BV, rhs: BV) -> BV:
-        ...
+    def Or(cls, lhs: BV, rhs: BV) -> BV: ...
 
     @classmethod
-    def Neg(cls, operand: BV) -> BV:
-        ...
+    def Neg(cls, operand: BV) -> BV: ...
 
-    def __add__(self, other: BV) -> BV:
-        ...
+    def __add__(self, other: BV) -> BV: ...
 
-    def __mul__(self, other: BV) -> BV:
-        ...
+    def __mul__(self, other: BV) -> BV: ...
 
-    def __sub__(self, other: BV) -> BV:
-        ...
+    def __sub__(self, other: BV) -> BV: ...
 
-    def __and__(self, other: BV) -> BV:
-        ...
+    def __and__(self, other: BV) -> BV: ...
 
-    def __xor__(self, other: BV) -> BV:
-        ...
+    def __xor__(self, other: BV) -> BV: ...
 
-    def __mul__(self, other: BV) -> BV:
-        ...
+    def __mul__(self, other: BV) -> BV: ...
 
     @classmethod
-    def udiv(cls, lhs: BV, rhs: BV) -> BV:
-        ...
+    def udiv(cls, lhs: BV, rhs: BV) -> BV: ...
 
     @classmethod
-    def sdiv(cls, lhs: BV, rhs: BV) -> BV:
-        ...
+    def sdiv(cls, lhs: BV, rhs: BV) -> BV: ...
 
     @classmethod
-    def urem(cls, lhs: BV, rhs: BV) -> BV:
-        ...
+    def urem(cls, lhs: BV, rhs: BV) -> BV: ...
 
     @classmethod
-    def srem(cls, lhs: BV, rhs: BV) -> BV:
-        ...
+    def srem(cls, lhs: BV, rhs: BV) -> BV: ...
 
-    def __lshift__(self, other: BV) -> BV:
-        ...
+    def __lshift__(self, other: BV) -> BV: ...
 
     @classmethod
-    def ashr(cls, lhs: BV, rhs: BV) -> BV:
-        ...
+    def ashr(cls, lhs: BV, rhs: BV) -> BV: ...
 
     @classmethod
-    def lshr(cls, lhs: BV, rhs: BV) -> BV:
-        ...
+    def lshr(cls, lhs: BV, rhs: BV) -> BV: ...
 
     @classmethod
-    def umin(cls, lhs: BV, rhs: BV) -> BV:
-        ...
+    def umin(cls, lhs: BV, rhs: BV) -> BV: ...
 
     @classmethod
-    def smin(cls, lhs: BV, rhs: BV) -> BV:
-        ...
+    def smin(cls, lhs: BV, rhs: BV) -> BV: ...
 
     @classmethod
-    def umax(cls, lhs: BV, rhs: BV) -> BV:
-        ...
+    def umax(cls, lhs: BV, rhs: BV) -> BV: ...
 
     @classmethod
-    def smax(cls, lhs: BV, rhs: BV) -> BV:
-        ...
+    def smax(cls, lhs: BV, rhs: BV) -> BV: ...
 
     @classmethod
-    def set_high_bits(cls, lhs: BV, rhs: BV) -> BV:
-        ...
+    def set_high_bits(cls, lhs: BV, rhs: BV) -> BV: ...
 
     @classmethod
-    def set_low_bits(cls, lhs: BV, rhs: BV) -> BV:
-        ...
+    def set_low_bits(cls, lhs: BV, rhs: BV) -> BV: ...
 
     @classmethod
-    def clear_high_bits(cls, lhs: BV, rhs: BV) -> BV:
-        ...
+    def clear_high_bits(cls, lhs: BV, rhs: BV) -> BV: ...
 
     @classmethod
-    def clear_low_bits(cls, lhs: BV, rhs: BV) -> BV:
-        ...
+    def clear_low_bits(cls, lhs: BV, rhs: BV) -> BV: ...
 
     @classmethod
-    def set_sign_bit(cls, op: BV) -> BV:
-        ...
+    def set_sign_bit(cls, op: BV) -> BV: ...
 
     @classmethod
-    def clear_sign_bit(cls, op: BV) -> BV:
-        ...
+    def clear_sign_bit(cls, op: BV) -> BV: ...
 
     @classmethod
-    def countl_one(cls, op: BV) -> BV:
-        ...
+    def countl_one(cls, op: BV) -> BV: ...
 
     @classmethod
-    def countl_zero(cls, op: BV) -> BV:
-        ...
+    def countl_zero(cls, op: BV) -> BV: ...
 
     @classmethod
-    def countr_one(cls, op: BV) -> BV:
-        ...
+    def countr_one(cls, op: BV) -> BV: ...
 
     @classmethod
-    def countr_zero(cls, op: BV) -> BV:
-        ...
+    def countr_zero(cls, op: BV) -> BV: ...
 
     @classmethod
-    def ite(cls, cond: BV, lhs: BV, rhs: BV) -> BV:
-        ...
+    def ite(cls, cond: BV, lhs: BV, rhs: BV) -> BV: ...
 
     @classmethod
-    def get_bitwidth(cls, op: BV) -> BV:
-        ...
+    def get_bitwidth(cls, op: BV) -> BV: ...
 
     # Todo: different cmp ops
     @classmethod
-    def cmp(cls, lhs: BV, rhs: BV) -> BV:
-        ...
+    def cmp(cls, lhs: BV, rhs: BV) -> BV: ...
 
 
 mlir_op_to_egraph_op: dict[type[Operation], Callable[..., BV]] = {

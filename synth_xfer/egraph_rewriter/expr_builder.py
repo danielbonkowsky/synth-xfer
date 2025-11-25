@@ -1,12 +1,12 @@
 from __future__ import annotations
-from typing import Callable
-from egglog import i64Like, StringLike, EGraph, Expr, method, rewrite, ruleset, vars_
-from xdsl.dialects.func import FuncOp
-from xdsl.ir.core import BlockArgument
 
-from xdsl_smt.dialects.transfer import GetAllOnesOp, GetOp, MakeOp, Constant
-from xdsl.ir import Operation, OpResult
-from synth_xfer.egraph_rewriter.datatypes import BV, mlir_op_to_egraph_op, gen_ruleset
+from egglog import EGraph, Expr
+from xdsl.dialects.func import FuncOp
+from xdsl.ir import Operation
+from xdsl.ir.core import BlockArgument
+from xdsl_smt.dialects.transfer import Constant, GetAllOnesOp, GetOp, MakeOp
+
+from synth_xfer.egraph_rewriter.datatypes import BV, gen_ruleset, mlir_op_to_egraph_op
 
 
 class ExprBuilder:

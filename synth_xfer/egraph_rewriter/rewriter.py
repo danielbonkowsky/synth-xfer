@@ -1,8 +1,7 @@
 from typing import List
 
-from xdsl.dialects.func import FuncOp
-
 import egglog
+from xdsl.dialects.func import FuncOp
 
 from synth_xfer.egraph_rewriter.expr_builder import (
     ExprBuilder,
@@ -59,9 +58,7 @@ def rewrite_transfer_functions(
     print(f"Starting rewrite of {len(xfer_funcs)} transfer functions")
 
     # Filter functions to only include those ending with "_body" or "_cond"
-    functions_to_rewrite = [
-        func for func in xfer_funcs if should_rewrite_function(func)
-    ]
+    functions_to_rewrite = [func for func in xfer_funcs if should_rewrite_function(func)]
     print(
         f"Found {len(functions_to_rewrite)} functions to rewrite (ending with '_body' or '_cond'):"
     )
@@ -84,7 +81,7 @@ def rewrite_meet_of_all_functions(all_ret_exprs: List[tuple[egglog.Expr, ...]]) 
     """
     print(f"Building meet of {len(all_ret_exprs)} functions")
     meet_exprs = build_meet_expr(all_ret_exprs)
-    print(f"Done. ")
+    print("Done. ")
     for i, expr in enumerate(meet_exprs):
         simplfied, previous_cost, new_cost = simplify_term(expr)
         print(f"Known{i}: {previous_cost} -> {new_cost}")

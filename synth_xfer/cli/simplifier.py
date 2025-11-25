@@ -1,11 +1,12 @@
 from pathlib import Path
 
 from xdsl.context import Context
-from xdsl.parser import Parser
+from xdsl.dialects.arith import Arith
 from xdsl.dialects.builtin import Builtin, ModuleOp
 from xdsl.dialects.func import Func, FuncOp
+from xdsl.parser import Parser
 from xdsl_smt.dialects.transfer import Transfer
-from xdsl.dialects.arith import Arith
+
 from synth_xfer.cli.args import build_parser
 
 
@@ -32,8 +33,8 @@ def run(
 
     # Import the rewriter module
     from synth_xfer.egraph_rewriter.rewriter import (
-        rewrite_transfer_functions,
         rewrite_meet_of_all_functions,
+        rewrite_transfer_functions,
     )
 
     # Rewrite the transfer functions
