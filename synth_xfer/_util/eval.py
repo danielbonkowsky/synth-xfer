@@ -126,7 +126,9 @@ def setup_eval(
     constraint_fn_ptr = jit.get_fn_ptr(op_constraint.name) if op_constraint else None
 
     # TODO need to fix unary enum and eval
-    low_fns: dict[tuple[AbstractDomain, "BW"], Callable[[int, int | None], "ToEval"]] = {
+    low_fns: dict[
+        tuple[AbstractDomain, "BW"], Callable[[int, int | None], "ToEval"]
+    ] = {
         (AbstractDomain.AntiRange, 4): enum_low_antirange_4_4_4,
         (AbstractDomain.AntiRange, 8): enum_low_antirange_8_8_8,
         (AbstractDomain.AntiRange, 16): enum_low_antirange_16_16_16,

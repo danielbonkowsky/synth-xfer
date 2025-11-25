@@ -334,7 +334,9 @@ class SynthesizerContext:
 
     def update_weights(self, frequency: dict[str, dict[OpWithSignature, int]]):
         for ty, freq in frequency.items():
-            self.op_weights[ty] = {key: 1 for key in self.dsl_ops[ty].get_all_elements()}
+            self.op_weights[ty] = {
+                key: 1 for key in self.dsl_ops[ty].get_all_elements()
+            }
             for key, val in freq.items():
                 assert key in self.op_weights[ty]
                 self.op_weights[ty][key] += val
@@ -448,7 +450,9 @@ class SynthesizerContext:
                 return None
             return SelectOp(cond, true_val, false_val)
         elif issubclass(result_type, UnaryOp):
-            val = self.select_operand(operands_vals[0], self.get_constraint(result_type))
+            val = self.select_operand(
+                operands_vals[0], self.get_constraint(result_type)
+            )
             if val is None:
                 return None
             return result_type(val)

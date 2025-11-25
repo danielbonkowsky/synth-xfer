@@ -274,7 +274,8 @@ class _LowerFuncToLLVM:
 
         def __call__(
             self, b: ir.IRBuilder, *args: ir.Value, name: str = ""
-        ) -> ir.Instruction: ...
+        ) -> ir.Instruction:
+            ...
 
     _llvm_intrinsics: dict[type[Operation], _IRBuilderOp] = {  # type: ignore
         # unary
@@ -577,7 +578,9 @@ class _LowerFuncToLLVM:
             raw_op = self.b.udiv(lhs, safe_rhs, name=f"{res_name}_raw")
             val = all_ones
 
-        self.ssa_map[op.results[0]] = self.b.select(rhs_is_z, val, raw_op, name=res_name)
+        self.ssa_map[op.results[0]] = self.b.select(
+            rhs_is_z, val, raw_op, name=res_name
+        )
 
     @add_op.register
     def _(self, op: ShlOp | LShrOp) -> None:
@@ -631,12 +634,16 @@ class _LowerFuncToLLVM:
         all_ones = ir.Constant(int_ty, (2**self.bw) - 1)
         int_min = ir.Constant(int_ty, (2 ** (self.bw - 1)))
 
-        rhs_is_zero = self.b.icmp_signed("==", rhs, zero, name=f"{res_name}_rhs_is_zero")
+        rhs_is_zero = self.b.icmp_signed(
+            "==", rhs, zero, name=f"{res_name}_rhs_is_zero"
+        )
         lhs_is_neg = self.b.icmp_signed("<", lhs, zero, name=f"{res_name}_lhs_is_neg")
         lhs_is_im = self.b.icmp_signed(
             "==", lhs, int_min, name=f"{res_name}_lhs_is_int_min"
         )
-        rhs_is_m1 = self.b.icmp_signed("==", rhs, all_ones, name=f"{res_name}_rhs_is_m1")
+        rhs_is_m1 = self.b.icmp_signed(
+            "==", rhs, all_ones, name=f"{res_name}_rhs_is_m1"
+        )
 
         ov_case = self.b.and_(lhs_is_im, rhs_is_m1, name=f"{res_name}_ov_case")
         ub_case = self.b.or_(rhs_is_zero, ov_case, name=f"{res_name}_ub_case")

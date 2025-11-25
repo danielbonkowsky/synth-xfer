@@ -80,7 +80,8 @@ def main() -> None:
         raise FileExistsError(f'Output folder "{args.output}" already exists.')
 
     kb_inputs = [
-        (x, AbstractDomain.KnownBits, start_dir / f"{x}.mlir", args) for x in args.kb_eval
+        (x, AbstractDomain.KnownBits, start_dir / f"{x}.mlir", args)
+        for x in args.kb_eval
     ]
 
     ucr_inputs = [

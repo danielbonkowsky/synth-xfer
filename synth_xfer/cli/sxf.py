@@ -38,7 +38,9 @@ def _eval_helper(
         lowerer.add_fn(helper_funcs.get_top_func)
 
         if not transfer:
-            ret_top_func = FunctionWithCondition(top_as_xfer(helper_funcs.transfer_func))
+            ret_top_func = FunctionWithCondition(
+                top_as_xfer(helper_funcs.transfer_func)
+            )
             ret_top_func.set_func_name("ret_top")
             transfer = [ret_top_func]
 
@@ -123,7 +125,9 @@ def run(
     for ith_iter in range(num_iters):
         iter_start = perf_counter()
         # gradually increase the program length
-        current_prog_len += (program_length - current_prog_len) // (num_iters - ith_iter)
+        current_prog_len += (program_length - current_prog_len) // (
+            num_iters - ith_iter
+        )
         current_total_rounds += (total_rounds - current_total_rounds) // (
             num_iters - ith_iter
         )

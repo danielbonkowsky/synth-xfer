@@ -70,7 +70,8 @@ class SolutionSet(ABC):
         # Parameters used by SMT verifier
         helper_funcs: HelperFuncs,
         num_unsound_candidates: int,
-    ) -> SolutionSet: ...
+    ) -> SolutionSet:
+        ...
 
     def has_solution(self) -> bool:
         return self.solutions_size != 0
@@ -181,7 +182,9 @@ class UnsizedSolutionSet(SolutionSet):
 
         while len(candidates) > 0:
             result = self.eval_improve(candidates)
-            if result[0].get_base_dist() == 0:  # current solution set is already perfect
+            if (
+                result[0].get_base_dist() == 0
+            ):  # current solution set is already perfect
                 break
             cand, max_improve_res = max(
                 zip(candidates, result), key=lambda x: x[1].get_potential_improve()
@@ -190,7 +193,9 @@ class UnsizedSolutionSet(SolutionSet):
                 break
 
             body_number = cand.func.attributes["number"]
-            cond_number = "None" if cand.cond is None else cand.cond.attributes["number"]
+            cond_number = (
+                "None" if cand.cond is None else cand.cond.attributes["number"]
+            )
 
             if (cand in new_candidates_sp) or (cand in new_candidates_c):
                 is_sound, _ = verify_function(
