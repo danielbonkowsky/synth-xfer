@@ -72,9 +72,7 @@ def synthesize_one_iteration(
     program_length = mcmc_samplers[0].length
     total_rounds = mcmc_samplers[0].total_steps
     transfers = [spl.get_current() for spl in mcmc_samplers]
-    func_with_cond_lst = _build_eval_list(
-        transfers, sp_range, p_range, c_range, prec_set
-    )
+    func_with_cond_lst = _build_eval_list(transfers, sp_range, p_range, c_range, prec_set)
 
     cmp_results = solution_set.eval_improve(func_with_cond_lst)
 

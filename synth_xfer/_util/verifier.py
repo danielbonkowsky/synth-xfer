@@ -115,9 +115,7 @@ def _add_poison_to_conc_fn(concrete_func: FuncOp) -> FuncOp:
     last_op.operands[0] = new_return_val.result
     new_args_type = [arg.type for arg in result_func.args]
     new_return_type = new_return_val.result.type
-    result_func.function_type = FunctionType.from_lists(
-        new_args_type, [new_return_type]
-    )
+    result_func.function_type = FunctionType.from_lists(new_args_type, [new_return_type])
     return result_func
 
 
