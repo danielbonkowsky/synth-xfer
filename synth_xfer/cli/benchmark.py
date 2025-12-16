@@ -48,6 +48,7 @@ def synth_run(
             transformer_file=tf_path,
             weighted_dsl=args.weighted_dsl,
             num_unsound_candidates=args.num_unsound_candidates,
+            optimize=args.optimize,
             sampler=sampler,
         )
 

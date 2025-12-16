@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Mapping, Sequence, Tuple
+from typing import Any, Dict, Mapping, Sequence, Tuple
 
 from egglog import Expr
 from egglog.declarations import (
@@ -36,10 +36,14 @@ def _build_op_maps() -> tuple[Mapping[str, type], Mapping[str, type]]:
     unary: Dict[str, type] = {}
     binary: Dict[str, type] = {}
     for op_cls, fn in mlir_op_to_egraph_op.items():
-        ref = fn.__egg_ref__
+        ref: Any = getattr(fn, "__egg_ref__", None)
+        if ref is None:
+            raise ValueError(f"Missing __egg_ref__ on {fn}")
         name = (
             ref.method_name if hasattr(ref, "method_name") else getattr(ref, "name", None)
         )
+        if not isinstance(name, str):
+            raise ValueError(f"Cannot resolve function name for {fn}")
         # Select has arity 3 and is handled specially
         if op_cls is SelectOp:
             continue
@@ -88,7 +92,12 @@ class ExprToMLIR:
         self._verify_return_arity(ret_exprs)
         results: list[SSAValue] = []
         for expr in ret_exprs:
-            results.append(self._convert_decl(expr.__egg_typed_expr__))
+            typed_expr = getattr(expr, "__egg_typed_expr__", None)
+            if not isinstance(typed_expr, TypedExprDecl):
+                raise TypeError(
+                    "Expected expression to have a TypedExprDecl at '__egg_typed_expr__'"
+                )
+            results.append(self._convert_decl(typed_expr))
 
         make_op = MakeOp(results)
         self.block.add_op(make_op)
@@ -142,16 +151,22 @@ class ExprToMLIR:
                 self._const_witness = val
                 return val
 
+        candidate: SSAValue | None = None
         for arg_idx, arg in enumerate(self.block.args):
             if isinstance(arg.type, AbstractValueType):
                 for idx, ty in enumerate(arg.type.get_fields()):
                     if ty == self.default_scalar_type:
                         get_op = GetOp(arg, idx)
                         self.block.add_op(get_op)
-                        val = get_op.result
-                        self.var_cache.setdefault(f"arg{arg_idx}_{idx}", val)
-                self._const_witness = val
-                return val
+                        candidate = get_op.result
+                        self.var_cache.setdefault(f"arg{arg_idx}_{idx}", candidate)
+                        break
+            if candidate is not None:
+                break
+
+        if candidate is not None:
+            self._const_witness = candidate
+            return candidate
 
         raise ValueError("Failed to synthesize a constant witness value.")
 
@@ -185,6 +200,10 @@ class ExprToMLIR:
             return self.expr_cache[node]
 
         if isinstance(node, LitDecl):
+            if not isinstance(node.value, int):
+                raise TypeError(
+                    f"Literal for Constant must be int, got {type(node.value)}"
+                )
             res = self._create_constant(node.value)
         elif isinstance(node, CallDecl):
             res = self._convert_call(node)
@@ -200,11 +219,19 @@ class ExprToMLIR:
         if isinstance(callable, ClassMethodRef) and callable.method_name == "var":
             lit = call.args[0].expr
             assert isinstance(lit, LitDecl)
+            if not isinstance(lit.value, str):
+                raise TypeError(
+                    f"Variable literal should be a string, got {type(lit.value)}"
+                )
             return self._get_var(lit.value)
 
         if isinstance(callable, InitRef):
             lit = call.args[0].expr
             assert isinstance(lit, LitDecl)
+            if not isinstance(lit.value, int):
+                raise TypeError(
+                    f"Literal for Constant must be int, got {type(lit.value)}"
+                )
             return self._create_constant(lit.value)
 
         operands = [self._convert_decl(arg) for arg in call.args]
@@ -226,11 +253,11 @@ class ExprToMLIR:
         elif method_name in self.unary_ops:
             assert len(operands) == 1
             op_cls = self.unary_ops[method_name]
-            op = op_cls(operands[0])  # pyright: ignore[reportCallIssue]
+            op = op_cls(operands[0])
         elif method_name in self.binary_ops:
             assert len(operands) == 2
             op_cls = self.binary_ops[method_name]
-            op = op_cls(operands[0], operands[1])  # pyright: ignore[reportCallIssue]
+            op = op_cls(operands[0], operands[1])
         else:
             raise ValueError(f"Unsupported BV operation '{method_name}'")
 

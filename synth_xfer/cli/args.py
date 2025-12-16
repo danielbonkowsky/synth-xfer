@@ -229,6 +229,12 @@ def build_parser(prog: str) -> Namespace:
             help=f"Zero or more items from: {', '.join(ALL_OPS)}",
         )
         p.add_argument(
+            "--optimize",
+            action=BooleanOptionalAction,
+            default=False,
+            help="Run e-graph-based rewrite optimizer on synthesized candidates",
+        )
+        p.add_argument(
             "--scr-eval",
             nargs="*",
             choices=ALL_OPS,
