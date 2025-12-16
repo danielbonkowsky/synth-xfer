@@ -22,6 +22,7 @@ def get_funcs(ctx: Context, p: Path) -> tuple[ModuleOp, list[FuncOp]]:
 def run(
     transfer_functions: Path,
     rewrite_meet: bool,
+    quiet: bool,
 ):
     ctx = Context()
     ctx.load_dialect(Arith)
@@ -38,14 +39,18 @@ def run(
     )
 
     # Rewrite the transfer functions
-    all_ret_exprs = rewrite_transfer_functions(xfer_funcs)
+    all_ret_exprs = rewrite_transfer_functions(xfer_funcs, quiet=quiet)
     if rewrite_meet:
-        rewrite_meet_of_all_functions(all_ret_exprs)
+        rewrite_meet_of_all_functions(all_ret_exprs, quiet=quiet)
 
 
 def main() -> None:
     args = build_parser("egraph_rewriter")
-    run(transfer_functions=args.transfer_functions, rewrite_meet=args.rewrite_meet)
+    run(
+        transfer_functions=args.transfer_functions,
+        rewrite_meet=args.rewrite_meet,
+        quiet=args.quiet,
+    )
 
 
 if __name__ == "__main__":

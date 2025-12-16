@@ -2,6 +2,7 @@ from argparse import (
     ArgumentDefaultsHelpFormatter,
     ArgumentParser,
     ArgumentTypeError,
+    BooleanOptionalAction,
     FileType,
     Namespace,
 )
@@ -144,6 +145,12 @@ def build_parser(prog: str) -> Namespace:
             action="store_true",
             help="rewrite the entire meet instead of individual functions",
         )
+        p.add_argument(
+            "--quiet",
+            action=BooleanOptionalAction,
+            default=True,
+            help="Suppress console output from the optimizer",
+        )
         return p.parse_args()
 
     if prog == "synth_xfer":
@@ -155,6 +162,12 @@ def build_parser(prog: str) -> Namespace:
             choices=[str(x) for x in AbstractDomain],
             required=True,
             help="Abstract Domain to evaluate",
+        )
+        p.add_argument(
+            "--optimize",
+            action=BooleanOptionalAction,
+            default=False,
+            help="Run e-graph-based rewrite optimizer on synthesized candidates",
         )
     if prog == "benchmark":
         p.add_argument(
