@@ -88,6 +88,7 @@ def run(
     transformer_file: Path,
     weighted_dsl: bool,
     num_unsound_candidates: int,
+    optimize: bool,
     sampler: Sampler,
 ) -> EvalResult:
     logger = get_logger()
@@ -113,7 +114,7 @@ def run(
 
     all_bws = lbw + [x[0] for x in mbw] + [x[0] for x in hbw]
     solution_eval_func = _eval_helper(to_eval, all_bws, helper_funcs, jit)
-    solution_set = UnsizedSolutionSet([], solution_eval_func)
+    solution_set = UnsizedSolutionSet([], solution_eval_func, optimize=optimize)
 
     context = _setup_context(random, False)
     context_weighted = _setup_context(random, False)
@@ -264,5 +265,6 @@ def main() -> None:
         transformer_file=op_path,
         weighted_dsl=args.weighted_dsl,
         num_unsound_candidates=args.num_unsound_candidates,
+        optimize=args.optimize,
         sampler=sampler,
     )

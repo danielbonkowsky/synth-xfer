@@ -21,6 +21,7 @@ from xdsl_smt.dialects.transfer import (
     MulOp,
     NegOp,
     OrOp,
+    PopCountOp,
     SDivOp,
     SelectOp,
     SetHighBitsOp,
@@ -138,6 +139,9 @@ class BV(Expr):
     @classmethod
     def cmp(cls, lhs: BV, rhs: BV) -> BV: ...
 
+    @classmethod
+    def pop_count(cls, op: BV) -> BV: ...
+
 
 mlir_op_to_egraph_op: dict[type[Operation], Callable[..., BV]] = {
     AddOp: BV.__add__,
@@ -171,6 +175,7 @@ mlir_op_to_egraph_op: dict[type[Operation], Callable[..., BV]] = {
     SelectOp: BV.ite,
     CmpOp: BV.cmp,
     GetBitWidthOp: BV.get_bitwidth,
+    PopCountOp: BV.pop_count,
 }
 
 

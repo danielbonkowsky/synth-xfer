@@ -14,6 +14,7 @@ from synth_xfer._util.log import get_logger, write_log_file
 from synth_xfer._util.parse_mlir import HelperFuncs
 from synth_xfer._util.synth_context import SynthesizerContext
 from synth_xfer.cli.verify import verify_function
+from synth_xfer.egraph_rewriter.rewriter import rewrite_single_function
 
 
 def _rename_functions(lst: list[FunctionWithCondition], prefix: str) -> list[str]:
@@ -41,6 +42,7 @@ class SolutionSet(ABC):
     eval_func: Callable[
         [list[FunctionWithCondition], list[FunctionWithCondition]], list[EvalResult]
     ]
+    optimize: bool
 
     def __init__(
         self,
@@ -49,6 +51,7 @@ class SolutionSet(ABC):
             [list[FunctionWithCondition], list[FunctionWithCondition]], list[EvalResult]
         ],
         is_perfect: bool = False,
+        optimize: bool = True,
     ):
         _rename_functions(initial_solutions, "partial_solution_")
         self.solutions = initial_solutions
@@ -56,6 +59,7 @@ class SolutionSet(ABC):
         self.eval_func = eval_func
         self.precise_set = []
         self.is_perfect = is_perfect
+        self.optimize = optimize
 
     def eval_improve(self, transfers: list[FunctionWithCondition]) -> list[EvalResult]:
         return self.eval_func(transfers, self.solutions)
@@ -142,8 +146,9 @@ class UnsizedSolutionSet(SolutionSet):
             list[EvalResult],
         ],
         is_perfect: bool = False,
+        optimize: bool = True,
     ):
-        super().__init__(initial_solutions, eval_func_with_cond, is_perfect)
+        super().__init__(initial_solutions, eval_func_with_cond, is_perfect, optimize)
 
     def handle_inconsistent_result(self, f: FunctionWithCondition):
         str_output = io.StringIO()
@@ -194,48 +199,92 @@ class UnsizedSolutionSet(SolutionSet):
             body_number = cand.func.attributes["number"]
             cond_number = "None" if cand.cond is None else cand.cond.attributes["number"]
 
-            removed = False
-            if (cand in new_candidates_sp) or (cand in new_candidates_c):
-                for bw in vbw:
+            def _verify_and_maybe_remove(
+                candidate: FunctionWithCondition,
+            ) -> FunctionWithCondition | None:
+                """Return True if candidate was removed due to verification failure/timeouts."""
+
+                def _rewrite(candidate: FunctionWithCondition) -> FunctionWithCondition:
+                    if not self.optimize:
+                        return candidate
+                    rwt_func = rewrite_single_function(candidate.func)
+                    # Todo: support rewriting condition functions later
+                    # rwt_cond = rewrite_single_function(candidate.cond) if candidate.cond is not None else None
+                    rwt_cond = candidate.cond
+                    rewritten = FunctionWithCondition(rwt_func, rwt_cond)
+                    rewritten.set_func_name(candidate.func_name)
+                    return rewritten
+
+                def _verify_once(
+                    bw: int,
+                    original: FunctionWithCondition,
+                    rewritten: FunctionWithCondition,
+                ) -> bool:
                     is_sound, _ = verify_function(
-                        bw, cand.get_function(), [cand.func, cand.cond], helper_funcs, 200
+                        bw,
+                        original.get_function(),
+                        [original.func, original.cond],
+                        helper_funcs,
+                        200,
                     )
+                    if self.optimize:
+                        is_sound_rwt, _ = verify_function(
+                            bw,
+                            rewritten.get_function(),
+                            [rewritten.func, rewritten.cond],
+                            helper_funcs,
+                            200,
+                        )
+                        if is_sound != is_sound_rwt:
+                            logger.info(
+                                f"Inconsistent rewrite, body: {body_number}, cond: {cond_number}, original soundness: {is_sound}, rewritten soundness: {is_sound_rwt}"
+                            )
+                            return False
                     if is_sound is None:
                         logger.info(
                             f"Skip a function of which verification timed out at bw {bw}, body: {body_number}, cond: {cond_number}"
                         )
-                        candidates.remove(cand)
-                        removed = True
-                        break
-                    elif not is_sound:
+                        return False
+                    if not is_sound:
                         logger.info(
                             f"Skip a unsound function at bw {bw}, body: {body_number}, cond: {cond_number}"
                         )
                         if bw in lbw:
-                            self.handle_inconsistent_result(cand)
-                        candidates.remove(cand)
-                        removed = True
-                        break
-            if removed:
+                            self.handle_inconsistent_result(original)
+                        return False
+                    return True
+
+                if (candidate in new_candidates_sp) or (candidate in new_candidates_c):
+                    rewritten = _rewrite(candidate)
+                    for bw in vbw:
+                        if not _verify_once(bw, candidate, rewritten):
+                            candidates.remove(candidate)
+                            return None
+                    return rewritten
+                return candidate
+
+            def _log_str_and_cond(candidate: FunctionWithCondition) -> tuple[str, bool]:
+                if candidate in new_candidates_sp:
+                    return "Add a new transformer", False
+                if candidate in new_candidates_c:
+                    return "Add a new transformer (cond)", True
+                if candidate.cond is None:
+                    return "Add a existing transformer", False
+                return "Add a existing transformer (cond)", True
+
+            cand_to_be_added = _verify_and_maybe_remove(cand)
+            if cand_to_be_added is None:
                 continue
 
-            if cand in new_candidates_sp:
-                log_str = "Add a new transformer"
-            elif cand in new_candidates_c:
-                log_str = "Add a new transformer (cond)"
+            log_str, is_cond = _log_str_and_cond(cand)
+            if is_cond:
                 num_cond_solutions += 1
-            else:
-                if cand.cond is None:
-                    log_str = "Add a existing transformer"
-                else:
-                    log_str = "Add a existing transformer (cond)"
-                    num_cond_solutions += 1
             from_weighted_dsl = "from_weighted_dsl" in cand.func.attributes
             logger.info(
                 f"{log_str}, body: {body_number}, cond: {cond_number}. After adding, Exact: {max_improve_res.get_exact_prop() * 100:.2f}%, Dist: {max_improve_res.get_dist():.2f}, weighted?: {from_weighted_dsl}"
             )
             candidates.remove(cand)
-            self.solutions.append(cand)
+            self.solutions.append(cand_to_be_added)
 
         logger.info(f"The number of solutions after reseting: {len(self.solutions)}")
         logger.info(f"The number of conditional solutions: {num_cond_solutions}")
