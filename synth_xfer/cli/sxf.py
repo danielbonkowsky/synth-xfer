@@ -90,6 +90,7 @@ def run(
     num_unsound_candidates: int,
     optimize: bool,
     sampler: Sampler,
+    mab: bool
 ) -> EvalResult:
     logger = get_logger()
     jit = Jit()
@@ -160,6 +161,7 @@ def run(
             current_prog_len,
             current_total_rounds,
             condition_length,
+            mab
         )
 
         solution_set = synthesize_one_iteration(
@@ -232,6 +234,11 @@ def main() -> None:
 
     domain = AbstractDomain[args.domain]
     op_path = Path(args.transfer_functions)
+    mab = args.mab
+    if (mab):
+        print("Multi-armed bandit enabled")
+    else:
+        print("Multi-armed bandit disabled")
 
     if args.output is None:
         outputs_folder = Path(f"{domain}_{op_path.stem}")
@@ -267,4 +274,5 @@ def main() -> None:
         num_unsound_candidates=args.num_unsound_candidates,
         optimize=args.optimize,
         sampler=sampler,
+        mab=mab
     )
