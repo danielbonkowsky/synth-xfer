@@ -2,12 +2,14 @@ from argparse import (
     ArgumentDefaultsHelpFormatter,
     ArgumentParser,
     ArgumentTypeError,
+    BooleanOptionalAction,
     FileType,
     Namespace,
 )
 from pathlib import Path
 
 from synth_xfer._util.domain import AbstractDomain
+from synth_xfer._util.random import Sampler
 
 
 def int_tuple(s: str) -> tuple[int, int]:
@@ -70,6 +72,49 @@ def int_list(s: str) -> list[int]:
         raise ArgumentTypeError("Empty list of integers")
 
     return result
+
+
+def make_sampler_parser(p: ArgumentParser):
+    mx = p.add_mutually_exclusive_group(required=False)
+    mx.add_argument(
+        "-uniform", action="store_true", help="Use uniform sampling (default)"
+    )
+    mx.add_argument("-normal", action="store_true", help="Use normal sampling")
+    mx.add_argument(
+        "-skew-left", action="store_true", help="Use skew-normal left sampling"
+    )
+    mx.add_argument(
+        "-skew-right", action="store_true", help="Use skew-normal right sampling"
+    )
+    mx.add_argument(
+        "-bimodal", action="store_true", help="Use bimodal symmetric sampling"
+    )
+
+    g_normal = p.add_argument_group("normal options")
+    g_normal.add_argument("-sigma", type=float, default=0.15, help="Stddev in unit space")
+
+    g_skew = p.add_argument_group("skew options")
+    g_skew.add_argument("-alpha", type=float, default=5.0, help="Skew magnitude (>0)")
+
+    g_bimodal = p.add_argument_group("bimodal options")
+    g_bimodal.add_argument(
+        "-separation", type=float, default=0.22, help="Peak separation in [0, 0.49]"
+    )
+
+    return p
+
+
+def get_sampler(args: Namespace) -> Sampler:
+    if args.normal:
+        return Sampler.normal(sigma=args.sigma)
+    if args.skew_left:
+        return Sampler.skew_left(sigma=args.sigma, alpha=args.alpha)
+    if args.skew_right:
+        return Sampler.skew_right(sigma=args.sigma, alpha=args.alpha)
+    if args.bimodal:
+        return Sampler.bimodal(sigma=args.sigma, separation=args.separation)
+
+    return Sampler.uniform()
 
 
 ALL_OPS = [
@@ -137,15 +182,6 @@ ALL_OPS = [
 def build_parser(prog: str) -> Namespace:
     p = ArgumentParser(prog=prog, formatter_class=ArgumentDefaultsHelpFormatter)
 
-    if prog == "egraph_rewriter":
-        p.add_argument("transfer_functions", type=Path, help="path to transfer function")
-        p.add_argument(
-            "-rewrite_meet",
-            action="store_true",
-            help="rewrite the entire meet instead of individual functions",
-        )
-        return p.parse_args()
-
     if prog == "synth_xfer":
         p.add_argument("transfer_functions", type=Path, help="path to transfer function")
         p.add_argument("-random_file", type=FileType("r"), help="file for preset rng")
@@ -156,23 +192,24 @@ def build_parser(prog: str) -> Namespace:
             required=True,
             help="Abstract Domain to evaluate",
         )
+
     if prog == "benchmark":
         p.add_argument(
-            "--kb-eval",
+            "-kb-eval",
             nargs="*",
             choices=ALL_OPS,
             default=[],
             help=f"Zero or more items from: {', '.join(ALL_OPS)}",
         )
         p.add_argument(
-            "--ucr-eval",
+            "-ucr-eval",
             nargs="*",
             choices=ALL_OPS,
             default=[],
             help=f"Zero or more items from: {', '.join(ALL_OPS)}",
         )
         p.add_argument(
-            "--scr-eval",
+            "-scr-eval",
             nargs="*",
             choices=ALL_OPS,
             default=[],
@@ -181,6 +218,13 @@ def build_parser(prog: str) -> Namespace:
 
     output_dir = Path("outputs") if prog == "benchmark" else None
     p.add_argument("-o", "--output", type=Path, help="Output dir", default=output_dir)
+    make_sampler_parser(p)
+    p.add_argument(
+        "-optimize",
+        action=BooleanOptionalAction,
+        default=False,
+        help="Run e-graph-based rewrite optimizer on synthesized candidates",
+    )
     p.add_argument("-random_seed", type=int, help="seed for synthesis")
     p.add_argument(
         "-program_length",

@@ -6,7 +6,7 @@ from typing import Any
 
 from synth_xfer._util.domain import AbstractDomain
 from synth_xfer._util.log import init_logging
-from synth_xfer.cli.args import build_parser
+from synth_xfer.cli.args import build_parser, get_sampler
 from synth_xfer.cli.sxf import run
 
 
@@ -18,6 +18,8 @@ def synth_run(
     tf_path = x[2]
     args = x[3]
 
+    sampler = get_sampler(args)
+
     print(f"Running {domain} {func_name}")
 
     try:
@@ -26,6 +28,7 @@ def synth_run(
 
         logger = init_logging(output_folder, not args.quiet)
         max_len = max(len(k) for k in vars(args))
+        logger.config(f"{'transfer_functions':<{max_len}} | {tf_path}")
         [logger.config(f"{k:<{max_len}} | {v}") for k, v in vars(args).items()]
 
         res = run(
@@ -46,6 +49,8 @@ def synth_run(
             transformer_file=tf_path,
             weighted_dsl=args.weighted_dsl,
             num_unsound_candidates=args.num_unsound_candidates,
+            optimize=args.optimize,
+            sampler=sampler,
         )
 
         return {
