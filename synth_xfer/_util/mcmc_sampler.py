@@ -226,8 +226,8 @@ class MCMCSampler:
 
         # dict comp, all valid operands based on operator position
         valid_operands = {
-            ty : self.current.get_valid_operands(idx, ty)
-            for ty in [INT_T, BOOL_T]
+            type : self.current.get_valid_operands(idx, ty)
+            for type in [INT_T, BOOL_T]
         }
 
         assert values, "No valid operations available for replacement"
