@@ -215,7 +215,7 @@ class MCMCSampler:
         ops_with_target_type = set(self.context.dsl_ops[op_type].get_all_elements())
 
         # calculate decayed timestep
-        pulled = 1
+        pulled = 0
         for _, (score, npulled) in self.ops.items():
             pulled += npulled
 
@@ -226,13 +226,13 @@ class MCMCSampler:
 
         # dict comp, all valid operands based on operator position
         valid_operands = {
-            type : self.current.get_valid_operands(idx, ty)
+            type : self.current.get_valid_operands(idx, type)
             for type in [INT_T, BOOL_T]
         }
 
         assert values, "No valid operations available for replacement"
 
-        new_op = None
+        new_op: type[Operation] | None = None
         best_op: type[Operation] | None = None
         while new_op is None:
 
