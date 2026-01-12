@@ -72,7 +72,7 @@ beta = 0.25    # exploration tuning
 epsilon = 0.01 # epsilon for epsilon greedy
 
 # Names of all the operator subsets (not including ITE)
-subset_names = ["bitwise", "add", "max", "mul", "shift", "bitset", "bitcount"]
+subset_names = ["bitwise", "boolean", "add", "max", "mul", "shift", "bitset", "bitcount"]
 
 # All operator subsets and their corresponding operations. There is no ITE
 # operator, and there are some operations which aren't categorized (PopCountOp,
@@ -80,7 +80,8 @@ subset_names = ["bitwise", "add", "max", "mul", "shift", "bitset", "bitcount"]
 
 # ADDED CmpOp to bitwise subset
 subsets = {
-    "bitwise" : [AndOp, OrOp, XorOp, NegOp, CmpOp],
+    "boolean" : [AndOp, OrOp, XorOp, CmpOp],
+    "bitwise" : [AndOp, OrOp, XorOp, NegOp],
     "add" : [AddOp, SubOp],
     "max" : [UMaxOp, UMinOp, SMaxOp, SMinOp],
     "mul" : [MulOp, UDivOp, SDivOp, URemOp, SRemOp],
