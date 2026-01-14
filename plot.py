@@ -1,5 +1,6 @@
-import re
-import sys
+import re, math
+import matplotlib.pyplot as plt
+import numpy as np
 
 def parse_infolog_exactness(file_path):
     """
@@ -66,18 +67,57 @@ def parse_perflog_times(file_path):
         return []
 
 
-# --- Example Usage ---
 if __name__ == "__main__":
-    # You can change these filenames to process specific log files
+    # Define your file lists
     log_files = ['outputs/abds/info-abds.log', 'outputs/add/info-add.log', 'outputs/ashr/info-ashr.log']
     perf_files = ['outputs/abds/perf-abds.log', 'outputs/add/perf-add.log', 'outputs/ashr/perf-ashr.log']
 
-    for log_file in log_files:
-        scores = parse_infolog_exactness(log_file)
-        if scores:
-            print(f"{log_file}: {scores}")
+    # 1. Setup the grid dimensions
+    num_plots = len(log_files)
+    cols = 3  # Number of columns you want
+    rows = math.ceil(num_plots / cols)
+
+    plt.style.use('bmh')
     
-    for perf_file in perf_files:
-        times = parse_perflog_times(perf_file)
-        if times:
-            print(f"{perf_file}: {times}")
+    # Create the figure and subplots
+    # figsize is (width, height) - adjusted here to give each plot enough room
+    fig, axes = plt.subplots(rows, cols, figsize=(5 * cols, 4 * rows))
+    
+    # Flatten axes array for easy iteration (handles 1D or 2D arrays automatically)
+    # If there is only 1 plot, axes is not a list, so we wrap it.
+    if num_plots == 1:
+        axes_flat = [axes]
+    else:
+        axes_flat = axes.flatten()
+
+    # 2. Iterate through files and axes simultaneously
+    for i, (log_f, perf_f) in enumerate(zip(log_files, perf_files)):
+        ax = axes_flat[i]
+        
+        # Parse data for this specific pair
+        scores = parse_infolog_exactness(log_f)
+        lengths = parse_perflog_times(perf_f)
+        
+        # Calculate cumulative times for this pair
+        times = [0]
+        for length in lengths:
+            times.append(times[-1] + length)
+
+        # 3. Plot on the specific subplot (ax)
+        ax.plot(times, scores, linestyle='-', color='#1f77b4', linewidth=2, label='Exactness', alpha=0.8)
+        ax.scatter(times, scores, color='#ff7f0e', s=50, label='Data Points', edgecolors='white')
+        
+        # Set dynamic title based on filename (e.g., 'info-abds.log')
+        title_name = log_f.split('/')[-1]
+        ax.set_title(title_name, fontsize=12, pad=10)
+        ax.set_xlabel('Time', fontsize=10)
+        ax.set_ylabel('Exactness', fontsize=10)
+        ax.legend(loc='best', frameon=True, fontsize='small')
+
+    # 4. Hide any unused empty subplots
+    for j in range(num_plots, len(axes_flat)):
+        fig.delaxes(axes_flat[j])
+
+    # Adjust layout to prevent overlap
+    plt.tight_layout()
+    plt.show()
