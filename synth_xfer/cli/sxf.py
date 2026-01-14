@@ -2,10 +2,9 @@ from pathlib import Path
 from time import perf_counter
 from typing import TYPE_CHECKING, Callable
 
-import xdsl.dialects.arith as arith
 from synth_xfer._util.cond_func import FunctionWithCondition
 from synth_xfer._util.domain import AbstractDomain
-from synth_xfer._util.dsl_operators import DslOpSet, load_dsl_ops, BOOL_T, INT_T
+from synth_xfer._util.dsl_operators import DslOpSet, load_dsl_ops
 from synth_xfer._util.eval import eval_transfer_func, setup_eval
 from synth_xfer._util.eval_result import EvalResult
 from synth_xfer._util.jit import Jit
@@ -17,48 +16,8 @@ from synth_xfer._util.parse_mlir import HelperFuncs, get_helper_funcs, top_as_xf
 from synth_xfer._util.random import Random, Sampler
 from synth_xfer._util.solution_set import UnsizedSolutionSet
 from synth_xfer._util.synth_context import SynthesizerContext
+from synth_xfer._util.op_groups import *
 from synth_xfer.cli.args import build_parser, get_sampler
-from xdsl_smt.dialects.transfer import (
-    AbstractValueType,
-    AddOp,
-    AndOp,
-    AShrOp,
-    ClearHighBitsOp,
-    ClearLowBitsOp,
-    ClearSignBitOp,
-    CmpOp,
-    Constant,
-    CountLOneOp,
-    CountLZeroOp,
-    CountROneOp,
-    CountRZeroOp,
-    GetAllOnesOp,
-    GetBitWidthOp,
-    GetOp,
-    LShrOp,
-    MakeOp,
-    MulOp,
-    NegOp,
-    OrOp,
-    PopCountOp,
-    SDivOp,
-    SelectOp,
-    SetHighBitsOp,
-    SetLowBitsOp,
-    SetSignBitOp,
-    ShlOp,
-    SMaxOp,
-    SMinOp,
-    SRemOp,
-    SubOp,
-    TransIntegerType,
-    UDivOp,
-    UMaxOp,
-    UMinOp,
-    UnaryOp,
-    URemOp,
-    XorOp,
-)
 
 if TYPE_CHECKING:
     from synth_xfer._eval_engine import ToEval
