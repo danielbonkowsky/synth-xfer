@@ -188,39 +188,8 @@ def run_subset(
     prev_exact = init_cmp_res.get_exact_prop()
     subset_scores: dict[tuple[str, ...], float] = {}
     for subset in get_name_powerset():
-        print(f'subset: {subset}')
-        mcmc_samplers, prec_set, ranges = setup_mcmc(
-            helper_funcs.transfer_func,
-            solution_set.precise_set,
-            current_num_abd_procs,
-            num_programs,
-            contexts[subset],
-            contexts_weighted[subset],
-            contexts_cond[subset],
-            current_prog_len,
-            current_total_rounds,
-            condition_length,
-            mab=None
-        )
+        subset_scores[subset] = 0.1
 
-        solution_set = synthesize_one_iteration(
-            -1,
-            random,
-            solution_set,
-            helper_funcs,
-            inv_temp,
-            num_unsound_candidates,
-            ranges,
-            mcmc_samplers,
-            prec_set,
-            lbw,
-            vbw
-        )
-
-        cmp_res = solution_set.eval_improve([])[0]
-        subset_scores[subset] = max(cmp_res.get_exact_prop() - prev_exact, 0.01)
-        prev_exact = cmp_res.get_exact_prop()
-    
     s = distribution_to_table_string(subset_scores, headers=["subset", "score"])
     logger.info(s)
 
@@ -235,41 +204,41 @@ def run_subset(
             num_iters - ith_iter
         )
 
-        for i in range(10): # to parallelize
-            subsets: list[tuple[str, ...]] = list(subset_scores.keys())
-            chosen_subset = random.choice_weighted(subsets, subset_scores)
+        subsets: list[tuple[str, ...]] = list(subset_scores.keys())
+        chosen_subset = random.choice_weighted(subsets, subset_scores)
+        print(f"chosen_subset: {chosen_subset}")
 
-            mcmc_samplers, prec_set, ranges = setup_mcmc(
-                helper_funcs.transfer_func,
-                solution_set.precise_set,
-                current_num_abd_procs,
-                num_programs,
-                contexts[chosen_subset],
-                contexts_weighted[chosen_subset],
-                contexts_cond[chosen_subset],
-                current_prog_len,
-                current_total_rounds,
-                condition_length,
-                mab=None
-            )
+        mcmc_samplers, prec_set, ranges = setup_mcmc(
+            helper_funcs.transfer_func,
+            solution_set.precise_set,
+            current_num_abd_procs,
+            num_programs,
+            contexts[chosen_subset],
+            contexts_weighted[chosen_subset],
+            contexts_cond[chosen_subset],
+            current_prog_len,
+            current_total_rounds,
+            condition_length,
+            mab=None
+        )
 
-            solution_set = synthesize_one_iteration(
-                ith_iter,
-                random,
-                solution_set,
-                helper_funcs,
-                inv_temp,
-                num_unsound_candidates,
-                ranges,
-                mcmc_samplers,
-                prec_set,
-                lbw,
-                vbw
-            )
+        solution_set = synthesize_one_iteration(
+            ith_iter,
+            random,
+            solution_set,
+            helper_funcs,
+            inv_temp,
+            num_unsound_candidates,
+            ranges,
+            mcmc_samplers,
+            prec_set,
+            lbw,
+            vbw
+        )
 
-            cmp_res = solution_set.eval_improve([])[0]
-            subset_scores[chosen_subset] = max(cmp_res.get_exact_prop() - prev_exact, 0.01)
-            prev_exact = cmp_res.get_exact_prop()
+        cmp_res = solution_set.eval_improve([])[0]
+        subset_scores[chosen_subset] = max(cmp_res.get_exact_prop() - prev_exact, 0.01)
+        prev_exact = cmp_res.get_exact_prop()
         
         s = distribution_to_table_string(subset_scores, headers=["subset", "score"])
         logger.info(s)
