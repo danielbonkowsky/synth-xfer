@@ -66,58 +66,74 @@ def parse_perflog_times(file_path):
         print(f"Error: File '{file_path}' not found.")
         return []
 
-
 if __name__ == "__main__":
-    # Define your file lists
-    log_files = ['outputs/abds/info-abds.log', 'outputs/add/info-add.log', 'outputs/ashr/info-ashr.log']
-    perf_files = ['outputs/abds/perf-abds.log', 'outputs/add/perf-add.log', 'outputs/ashr/perf-ashr.log']
+    # Define your file lists (Must be ordered in pairs you want to compare)
+    # Example: [Pair1_A, Pair1_B, Pair2_A, Pair2_B]
+    log_files = ['outputs/ashr/info.log', 'outputs/ashr-base/info.log']
+    perf_files = ['outputs/ashr/perf.log', 'outputs/ashr-base/perf.log']
 
+    # --- Configuration ---
+    LINES_PER_PLOT = 2  # How many lines you want on one graph
+    
     # 1. Setup the grid dimensions
-    num_plots = len(log_files)
-    cols = 3  # Number of columns you want
+    # We divide total files by lines_per_plot to find how many plots we need
+    num_plots = math.ceil(len(log_files) / LINES_PER_PLOT)
+    cols = 2  # Adjusted columns for better visibility
     rows = math.ceil(num_plots / cols)
 
     plt.style.use('bmh')
     
-    # Create the figure and subplots
-    # figsize is (width, height) - adjusted here to give each plot enough room
-    fig, axes = plt.subplots(rows, cols, figsize=(5 * cols, 4 * rows))
+    # Create figure with dynamic height based on rows
+    fig, axes = plt.subplots(rows, cols, figsize=(6 * cols, 5 * rows))
     
-    # Flatten axes array for easy iteration (handles 1D or 2D arrays automatically)
-    # If there is only 1 plot, axes is not a list, so we wrap it.
+    # Ensure axes is always a flat list (handles 1 subplot case vs multiple)
     if num_plots == 1:
-        axes_flat = [axes]
+        axes_flat = [axes] if cols == 1 and rows == 1 else np.array([axes]).flatten()
     else:
         axes_flat = axes.flatten()
 
-    # 2. Iterate through files and axes simultaneously
+    # 2. Iterate through all files
     for i, (log_f, perf_f) in enumerate(zip(log_files, perf_files)):
-        ax = axes_flat[i]
         
-        # Parse data for this specific pair
+        # Determine which subplot this file belongs to
+        # i // 2 means indices 0 and 1 go to plot 0, indices 2 and 3 go to plot 1
+        plot_idx = i // LINES_PER_PLOT
+        ax = axes_flat[plot_idx]
+        
+        # Parse data
         scores = parse_infolog_exactness(log_f)
         lengths = parse_perflog_times(perf_f)
         
-        # Calculate cumulative times for this pair
+        # Calculate cumulative times
         times = [0]
         for length in lengths:
             times.append(times[-1] + length)
-
-        # 3. Plot on the specific subplot (ax)
-        ax.plot(times, scores, linestyle='-', color='#1f77b4', linewidth=2, label='Exactness', alpha=0.8)
-        ax.scatter(times, scores, color='#ff7f0e', s=50, label='Data Points', edgecolors='white')
         
-        # Set dynamic title based on filename (e.g., 'info-abds.log')
-        title_name = log_f.split('/')[-1]
-        ax.set_title(title_name, fontsize=12, pad=10)
-        ax.set_xlabel('Time', fontsize=10)
-        ax.set_ylabel('Exactness', fontsize=10)
+        # --- Plotting Changes ---
+        
+        # Generate a dynamic label based on folder name (e.g., "ashr" or "ashr-base")
+        # This assumes structure outputs/<folder_name>/info.log
+        try:
+            label_name = log_f.split('/')[-2] 
+        except IndexError:
+            label_name = log_f 
+
+        # We REMOVED the hardcoded color='#1f77b4'. 
+        # Matplotlib will now automatically cycle colors (Blue for line 1, Orange for line 2)
+        ax.plot(times, scores, linewidth=2, label=label_name, alpha=0.8, marker='o', markersize=4)
+
+        # Set generic titles/labels only once per subplot (or overwrite safely)
+        if i % LINES_PER_PLOT == 0:
+            ax.set_title(f"Comparison Group {plot_idx + 1}", fontsize=12)
+            ax.set_xlabel('Time (s)', fontsize=10)
+            ax.set_ylabel('Exactness (%)', fontsize=10)
+
         ax.legend(loc='best', frameon=True, fontsize='small')
 
-    # 4. Hide any unused empty subplots
+    # 3. Hide unused subplots
+    # This cleans up the grid if you have an odd number of groups
     for j in range(num_plots, len(axes_flat)):
         fig.delaxes(axes_flat[j])
 
-    # Adjust layout to prevent overlap
     plt.tight_layout()
     plt.show()
