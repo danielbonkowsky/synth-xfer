@@ -44,14 +44,13 @@ from xdsl_smt.dialects.transfer import (
 )
 
 op_groups: dict[str, DslOpSet] = {
-    "boolean" : {INT_T: [], BOOL_T: [arith.AndIOp, arith.OrIOp, arith.XOrIOp, CmpOp]}, 
-    "bitwise" : {INT_T: [AndOp, OrOp, XorOp, NegOp], BOOL_T: []}, 
-    "add" : {INT_T: [AddOp, SubOp], BOOL_T: []}, 
-    "max" : {INT_T: [UMaxOp, UMinOp, SMaxOp, SMinOp], BOOL_T: []}, 
-    "mul" : {INT_T: [MulOp, UDivOp, SDivOp, URemOp, SRemOp], BOOL_T: []},
-    "shift" : {INT_T: [ShlOp, AShrOp, LShrOp], BOOL_T: []},
-    "bitset" : {INT_T: [SetHighBitsOp, SetLowBitsOp, ClearLowBitsOp, ClearHighBitsOp, SetSignBitOp, ClearSignBitOp], BOOL_T: []},
-    "bitcount" : {INT_T: [CountLOneOp, CountLZeroOp, CountROneOp, CountRZeroOp], BOOL_T: []}
+    "bitwise" : {INT_T: [AndOp, OrOp, XorOp, NegOp], BOOL_T: [arith.AndIOp, arith.OrIOp, arith.XOrIOp, CmpOp]}, 
+    "add" : {INT_T: [AddOp, SubOp], BOOL_T: [arith.AndIOp, arith.OrIOp, arith.XOrIOp, CmpOp]}, 
+    "max" : {INT_T: [UMaxOp, UMinOp, SMaxOp, SMinOp], BOOL_T: [arith.AndIOp, arith.OrIOp, arith.XOrIOp, CmpOp]}, 
+    "mul" : {INT_T: [MulOp, UDivOp, SDivOp, URemOp, SRemOp], BOOL_T: [arith.AndIOp, arith.OrIOp, arith.XOrIOp, CmpOp]},
+    "shift" : {INT_T: [ShlOp, AShrOp, LShrOp], BOOL_T: [arith.AndIOp, arith.OrIOp, arith.XOrIOp, CmpOp]},
+    "bitset" : {INT_T: [SetHighBitsOp, SetLowBitsOp, ClearLowBitsOp, ClearHighBitsOp, SetSignBitOp, ClearSignBitOp], BOOL_T: [arith.AndIOp, arith.OrIOp, arith.XOrIOp, CmpOp]},
+    "bitcount" : {INT_T: [CountLOneOp, CountLZeroOp, CountROneOp, CountRZeroOp], BOOL_T: [arith.AndIOp, arith.OrIOp, arith.XOrIOp, CmpOp]}
 }
 
 def get_op_groups() -> list[str]:
@@ -78,13 +77,18 @@ def get_ops_in_subset(subset: tuple[str, ...]) -> DslOpSet | None:
         ops[INT_T] += get_ops_in_group(op_group)[INT_T]
         ops[BOOL_T] += get_ops_in_group(op_group)[BOOL_T]
     
+    ops[INT_T] = list(set(ops[INT_T]))
+    ops[BOOL_T] = list(set(ops[BOOL_T]))
+
     return ops
 
 
 def get_name_powerset() -> list[tuple[str, ...]]:
     """ return the powerset of all the group names """
 
-    return list(chain.from_iterable(combinations(op_groups, r) for r in range(1,len(op_groups)+1)))
+    names = list(chain.from_iterable(combinations(op_groups, r) for r in range(1,len(op_groups)+1)))
+
+    return names
 
 def get_full_powerset() -> dict[tuple[str, ...], DslOpSet]:
     """ 
@@ -94,7 +98,7 @@ def get_full_powerset() -> dict[tuple[str, ...], DslOpSet]:
     """
 
     # generate powerset of group names
-    groupset = list(chain.from_iterable(combinations(op_groups, r) for r in range(1,len(op_groups)+1)))
+    groupset = get_name_powerset()
 
     ps: dict[tuple[str, ...], DslOpSet] = {}
 
@@ -105,6 +109,9 @@ def get_full_powerset() -> dict[tuple[str, ...], DslOpSet]:
         for op_group in subset:
             ops[INT_T] += get_ops_in_group(op_group)[INT_T]
             ops[BOOL_T] += get_ops_in_group(op_group)[BOOL_T]
+
+        ops[INT_T] = list(set(ops[INT_T]))
+        ops[BOOL_T] = list(set(ops[BOOL_T]))
 
         ps[subset] = ops
     

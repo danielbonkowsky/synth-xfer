@@ -311,12 +311,13 @@ def build_parser(prog: str) -> Namespace:
         help="number of unsound candidates considered for abduction",
         default=15,
     )
-    p.add_argument("-quiet", action="store_true")    
     p.add_argument(
-        "-mab",
-        type=str,
-        choices=["op", "subs"],
-        help="Enable multi-armed bandit mutation for: 'op' (operators) or 'subs' (subsets)"
+        "-subs",
+        action=BooleanOptionalAction,
+        default=False,
+        help="Enable or disable subset selection",
     )
+
+    p.add_argument("-quiet", action="store_true")    
 
     return p.parse_args()

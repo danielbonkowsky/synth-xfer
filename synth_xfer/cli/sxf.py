@@ -73,6 +73,226 @@ def _setup_context(
         c.use_basic_i1_ops()
     return c
 
+def distribution_to_table_string(data, headers=None):
+    if not data:
+        return "Table is empty."
+
+    # 1. Sort items
+    sorted_items = sorted(data.items(), key=lambda x: -x[1])
+
+    # 2. Format rows
+    # Column 0: The Tuple (as a string)
+    # Column 1: The Float
+    formatted_rows = []
+    for k, v in sorted_items:
+        key_str = str(k)       # Keeps the parenthesis, e.g., "('A', 'B')"
+        val_str = f"{v:.2f}"   # Standard float formatting
+        formatted_rows.append([key_str, val_str])
+    
+    # 3. Handle Headers
+    # We now know strictly that there are only 2 columns.
+    if not headers:
+        headers = ["Tuple", "Value"]
+    
+    # 4. Calculate column widths
+    widths = [len(h) for h in headers]
+    for row in formatted_rows:
+        for i, val in enumerate(row):
+            widths[i] = max(widths[i], len(val))
+
+    # 5. Build the table string
+    # Left align the tuple (col 0), Right align the float (col 1)
+    fmt = f"{{:<{widths[0]}}} | {{:>{widths[1]}}}"
+
+    lines = []
+    lines.append(fmt.format(*headers))
+    lines.append("-+-".join(["-" * w for w in widths]))
+    
+    for row in formatted_rows:
+        lines.append(fmt.format(*row))
+
+    return "\n".join(lines)
+
+def run_subset(
+    domain: AbstractDomain,
+    num_programs: int,
+    total_rounds: int,
+    program_length: int,
+    inv_temp: int,
+    vbw: list[int],
+    lbw: list[int],
+    mbw: list[tuple[int, int]],
+    hbw: list[tuple[int, int, int]],
+    num_iters: int,
+    condition_length: int,
+    num_abd_procs: int,
+    random_seed: int | None,
+    random_number_file: str | None,
+    transformer_file: Path,
+    weighted_dsl: bool,
+    num_unsound_candidates: int,
+    optimize: bool,
+    sampler: Sampler,
+) -> EvalResult:
+    logger = get_logger()
+    jit = Jit()
+
+    EvalResult.init_bw_settings(
+        set(lbw), set([t[0] for t in mbw]), set([t[0] for t in hbw])
+    )
+
+    logger.debug("Round_ID\tSound%\tUExact%\tDisReduce\tCost")
+
+    random = Random(random_seed)
+    random_seed = random.randint(0, 1_000_000) if random_seed is None else random_seed
+    if random_number_file is not None:
+        random.read_from_file(random_number_file)
+
+    helper_funcs = get_helper_funcs(transformer_file, domain)
+
+    start_time = perf_counter()
+    to_eval = setup_eval(lbw, mbw, hbw, random_seed, helper_funcs, jit, sampler)
+    run_time = perf_counter() - start_time
+    logger.perf(f"Enum engine took {run_time:.4f}s")
+
+    all_bws = lbw + [x[0] for x in mbw] + [x[0] for x in hbw]
+    solution_eval_func = _eval_helper(to_eval, all_bws, helper_funcs, jit)
+    solution_set = UnsizedSolutionSet([], solution_eval_func, optimize=optimize)
+
+    # initialize SynthesizerContexts for each subset to contain only allowed ops
+    contexts: dict[tuple[str, ...], SynthesizerContext] = {}
+    contexts_weighted: dict[tuple[str, ...], SynthesizerContext] = {}
+    contexts_cond: dict[tuple[str, ...], SynthesizerContext] = {}
+    for subset in get_name_powerset():
+        ops = get_ops_in_subset(subset)
+        contexts[subset] = _setup_context(random, False, ops)
+        contexts_weighted[subset] = _setup_context(random, False, ops)
+        contexts_cond[subset] = _setup_context(random, True, ops)
+
+    start_time = perf_counter()
+    init_cmp_res = solution_set.eval_improve([])[0]
+    run_time = perf_counter() - start_time
+    logger.perf(f"Init Eval took {run_time:.4f}s")
+
+    init_exact = init_cmp_res.get_exact_prop() * 100
+    s = f"Top Solution | Exact {init_exact:.4f}% |"
+    logger.info(s)
+    print(s)
+
+    current_prog_len = program_length
+    current_total_rounds = total_rounds
+    current_num_abd_procs = num_abd_procs
+    
+    # Inital round - run each subset once to get a score
+    prev_exact = init_cmp_res.get_exact_prop()
+    subset_scores: dict[tuple[str, ...], float] = {}
+    for subset in get_name_powerset():
+        subset_scores[subset] = 0.01
+
+    s = distribution_to_table_string(subset_scores, headers=["subset", "score"])
+    logger.info(s)
+
+    for ith_iter in range(num_iters):
+        iter_start = perf_counter()
+        # gradually increase the program length
+        current_prog_len += (program_length - current_prog_len) // (num_iters - ith_iter)
+        current_total_rounds += (total_rounds - current_total_rounds) // (
+            num_iters - ith_iter
+        )
+        current_num_abd_procs += (num_abd_procs - current_num_abd_procs) // (
+            num_iters - ith_iter
+        )
+
+        subsets: list[tuple[str, ...]] = list(subset_scores.keys())
+        chosen_subset = random.choice_weighted(subsets, subset_scores)
+        print(f"chosen_subset: {chosen_subset}")
+
+        mcmc_samplers, prec_set, ranges = setup_mcmc(
+            helper_funcs.transfer_func,
+            solution_set.precise_set,
+            current_num_abd_procs,
+            num_programs,
+            contexts[chosen_subset],
+            contexts_weighted[chosen_subset],
+            contexts_cond[chosen_subset],
+            current_prog_len,
+            current_total_rounds,
+            condition_length,
+        )
+
+        solution_set = synthesize_one_iteration(
+            ith_iter,
+            random,
+            solution_set,
+            helper_funcs,
+            inv_temp,
+            num_unsound_candidates,
+            ranges,
+            mcmc_samplers,
+            prec_set,
+            lbw,
+            vbw
+        )
+
+        cmp_res = solution_set.eval_improve([])[0]
+        subset_scores[chosen_subset] = max(cmp_res.get_exact_prop() - prev_exact, 0.01)
+        prev_exact = cmp_res.get_exact_prop()
+        
+        s = distribution_to_table_string(subset_scores, headers=["subset", "score"])
+        logger.info(s)
+        
+        write_log_file(
+            f"iter{ith_iter}.mlir", "\n".join(map(str, solution_set.solutions))
+        )
+
+        final_cmp_res = solution_set.eval_improve([])[0]
+        
+        lbw_mbw_log = "\n".join(
+            f"bw: {res.bitwidth}, dist: {res.dist:.2f}, exact%: {res.get_exact_prop() * 100:.4f}"
+            for res in final_cmp_res.get_low_med_res()
+        )
+        hbw_log = "\n".join(
+            f"bw: {res.bitwidth}, dist: {res.dist:.2f}"
+            for res in final_cmp_res.get_high_res()
+        )
+
+        iter_time = perf_counter() - iter_start
+        final_exact = final_cmp_res.get_exact_prop() * 100
+        print(
+            f"Iteration {ith_iter}  | Exact {final_exact:.4f}% | {solution_set.solutions_size} solutions | {iter_time:.4f}s |"
+        )
+
+        logger.info(
+            f"Iter {ith_iter} Finished. Result of Current Solution: \n{lbw_mbw_log}\n{hbw_log}\n"
+        )
+
+        if solution_set.is_perfect:
+            print("Found a perfect solution")
+            break
+    
+    # Eval last solution:
+    if not solution_set.has_solution():
+        raise Exception("Found no solutions")
+    solution_module = solution_set.generate_solution_mlir()
+    write_log_file("solution.mlir", solution_module)
+
+    lowerer = LowerToLLVM(all_bws)
+    lowerer.add_fn(helper_funcs.meet_func)
+    lowerer.add_fn(helper_funcs.get_top_func)
+    lowerer.add_mod(solution_module, ["solution"])
+    jit.add_mod(str(lowerer))
+    sol_ptrs = {bw: jit.get_fn_ptr(f"solution_{bw}_shim") for bw in all_bws}
+    sol_to_eval = {bw: (to_eval[bw], [sol_ptrs[bw]], []) for bw in all_bws}
+    solution_result = eval_transfer_func(sol_to_eval)[0]
+
+    solution_exact = solution_result.get_exact_prop() * 100
+    print(
+        f"Final Soln   | Exact {solution_exact:.4f}% | {solution_set.solutions_size} solutions |"
+    )
+
+    return solution_result
+
+
 def run(
     domain: AbstractDomain,
     num_programs: int,
@@ -94,7 +314,6 @@ def run(
     num_unsound_candidates: int,
     optimize: bool,
     sampler: Sampler,
-    mab: str
 ) -> EvalResult:
     logger = get_logger()
     jit = Jit()
@@ -166,7 +385,6 @@ def run(
             current_prog_len,
             current_total_rounds,
             condition_length,
-            mab
         )
 
         solution_set = synthesize_one_iteration(
@@ -239,13 +457,6 @@ def main() -> None:
 
     domain = AbstractDomain[args.domain]
     op_path = Path(args.transfer_functions)
-    mab = args.mab
-    if (mab == "op"):
-        print("Operation-level multi-armed bandit enabled")
-    elif (mab == "subs"):
-        print("Subset-level multi-armed bandit enabled")
-    else:
-        print("Multi-armed bandit disabled")
 
     if args.output is None:
         outputs_folder = Path(f"{domain}_{op_path.stem}")
@@ -261,26 +472,51 @@ def main() -> None:
     max_len = max(len(k) for k in vars(args))
     [logger.config(f"{k:<{max_len}} | {v}") for k, v in vars(args).items()]
 
-    run(
-        domain=domain,
-        num_programs=args.num_programs,
-        total_rounds=args.total_rounds,
-        program_length=args.program_length,
-        inv_temp=args.inv_temp,
-        vbw=args.vbw,
-        lbw=args.lbw,
-        mbw=args.mbw,
-        hbw=args.hbw,
-        num_iters=args.num_iters,
-        condition_length=args.condition_length,
-        num_abd_procs=args.num_abd_procs,
-        random_seed=args.random_seed,
-        random_number_file=args.random_file,
-        transformer_file=op_path,
-        dsl_ops_path=args.dsl_ops,
-        weighted_dsl=args.weighted_dsl,
-        num_unsound_candidates=args.num_unsound_candidates,
-        optimize=args.optimize,
-        sampler=sampler,
-        mab=mab
-    )
+
+    if (args.subs):
+        print("Subset selection enabled")
+        run_subset(
+            domain=domain,
+            num_programs=args.num_programs,
+            total_rounds=args.total_rounds,
+            program_length=args.program_length,
+            inv_temp=args.inv_temp,
+            vbw=args.vbw,
+            lbw=args.lbw,
+            mbw=args.mbw,
+            hbw=args.hbw,
+            num_iters=args.num_iters,
+            condition_length=args.condition_length,
+            num_abd_procs=args.num_abd_procs,
+            random_seed=args.random_seed,
+            random_number_file=args.random_file,
+            transformer_file=op_path,
+            weighted_dsl=args.weighted_dsl,
+            num_unsound_candidates=args.num_unsound_candidates,
+            optimize=args.optimize,
+            sampler=sampler,
+        )
+    else:
+        run(
+            domain=domain,
+            num_programs=args.num_programs,
+            total_rounds=args.total_rounds,
+            program_length=args.program_length,
+            inv_temp=args.inv_temp,
+            vbw=args.vbw,
+            lbw=args.lbw,
+            mbw=args.mbw,
+            hbw=args.hbw,
+            num_iters=args.num_iters,
+            condition_length=args.condition_length,
+            num_abd_procs=args.num_abd_procs,
+            random_seed=args.random_seed,
+            random_number_file=args.random_file,
+            transformer_file=op_path,
+            dsl_ops_path=args.dsl_ops,
+            weighted_dsl=args.weighted_dsl,
+            num_unsound_candidates=args.num_unsound_candidates,
+            optimize=args.optimize,
+            sampler=sampler,
+        )        
+    
