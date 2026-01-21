@@ -133,7 +133,6 @@ def run_subset(
     num_unsound_candidates: int,
     optimize: bool,
     sampler: Sampler,
-    mab: str
 ) -> EvalResult:
     logger = get_logger()
     jit = Jit()
@@ -188,7 +187,7 @@ def run_subset(
     prev_exact = init_cmp_res.get_exact_prop()
     subset_scores: dict[tuple[str, ...], float] = {}
     for subset in get_name_powerset():
-        subset_scores[subset] = 0.1
+        subset_scores[subset] = 0.01
 
     s = distribution_to_table_string(subset_scores, headers=["subset", "score"])
     logger.info(s)
@@ -219,7 +218,6 @@ def run_subset(
             current_prog_len,
             current_total_rounds,
             condition_length,
-            mab=None
         )
 
         solution_set = synthesize_one_iteration(
@@ -316,7 +314,6 @@ def run(
     num_unsound_candidates: int,
     optimize: bool,
     sampler: Sampler,
-    mab: str
 ) -> EvalResult:
     logger = get_logger()
     jit = Jit()
@@ -388,7 +385,6 @@ def run(
             current_prog_len,
             current_total_rounds,
             condition_length,
-            mab
         )
 
         solution_set = synthesize_one_iteration(
@@ -461,13 +457,6 @@ def main() -> None:
 
     domain = AbstractDomain[args.domain]
     op_path = Path(args.transfer_functions)
-    mab = args.mab
-    if (mab == "op"):
-        print("Operation-level multi-armed bandit enabled")
-    elif (mab == "subs"):
-        print("Subset-level multi-armed bandit enabled")
-    else:
-        print("Multi-armed bandit disabled")
 
     if args.output is None:
         outputs_folder = Path(f"{domain}_{op_path.stem}")
@@ -483,25 +472,51 @@ def main() -> None:
     max_len = max(len(k) for k in vars(args))
     [logger.config(f"{k:<{max_len}} | {v}") for k, v in vars(args).items()]
 
-    run_subset(
-        domain=domain,
-        num_programs=args.num_programs,
-        total_rounds=args.total_rounds,
-        program_length=args.program_length,
-        inv_temp=args.inv_temp,
-        vbw=args.vbw,
-        lbw=args.lbw,
-        mbw=args.mbw,
-        hbw=args.hbw,
-        num_iters=args.num_iters,
-        condition_length=args.condition_length,
-        num_abd_procs=args.num_abd_procs,
-        random_seed=args.random_seed,
-        random_number_file=args.random_file,
-        transformer_file=op_path,
-        weighted_dsl=args.weighted_dsl,
-        num_unsound_candidates=args.num_unsound_candidates,
-        optimize=args.optimize,
-        sampler=sampler,
-        mab=mab
-    )
+
+    if (args.subs):
+        print("Subset selection enabled")
+        run_subset(
+            domain=domain,
+            num_programs=args.num_programs,
+            total_rounds=args.total_rounds,
+            program_length=args.program_length,
+            inv_temp=args.inv_temp,
+            vbw=args.vbw,
+            lbw=args.lbw,
+            mbw=args.mbw,
+            hbw=args.hbw,
+            num_iters=args.num_iters,
+            condition_length=args.condition_length,
+            num_abd_procs=args.num_abd_procs,
+            random_seed=args.random_seed,
+            random_number_file=args.random_file,
+            transformer_file=op_path,
+            weighted_dsl=args.weighted_dsl,
+            num_unsound_candidates=args.num_unsound_candidates,
+            optimize=args.optimize,
+            sampler=sampler,
+        )
+    else:
+        run(
+            domain=domain,
+            num_programs=args.num_programs,
+            total_rounds=args.total_rounds,
+            program_length=args.program_length,
+            inv_temp=args.inv_temp,
+            vbw=args.vbw,
+            lbw=args.lbw,
+            mbw=args.mbw,
+            hbw=args.hbw,
+            num_iters=args.num_iters,
+            condition_length=args.condition_length,
+            num_abd_procs=args.num_abd_procs,
+            random_seed=args.random_seed,
+            random_number_file=args.random_file,
+            transformer_file=op_path,
+            dsl_ops_path=args.dsl_ops,
+            weighted_dsl=args.weighted_dsl,
+            num_unsound_candidates=args.num_unsound_candidates,
+            optimize=args.optimize,
+            sampler=sampler,
+        )        
+    
