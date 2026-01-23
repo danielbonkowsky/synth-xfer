@@ -88,7 +88,7 @@ def get_feature_vector(subset: tuple[str, ...]) -> tuple[float, ...] | None:
 
     (bitwise, add, max, mul, shift, bitset, bitcount)
     """
-    fvec: tuple[float, ...] = (0, 0, 0, 0, 0, 0, 0)
+    fvec: list[float] = [0, 0, 0, 0, 0, 0, 0]
 
     for group in subset:
         match group:
@@ -109,8 +109,7 @@ def get_feature_vector(subset: tuple[str, ...]) -> tuple[float, ...] | None:
             case _:
                 return None
     
-    return fvec
-
+    return tuple(fvec)
 
 def get_name_powerset() -> list[tuple[str, ...]]:
     """ return the powerset of all the group names """
