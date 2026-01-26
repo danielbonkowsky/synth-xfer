@@ -1,6 +1,7 @@
 from pathlib import Path
 from time import perf_counter
 from typing import TYPE_CHECKING, Callable
+import numpy as np
 
 from synth_xfer._util.cond_func import FunctionWithCondition
 from synth_xfer._util.domain import AbstractDomain
@@ -17,6 +18,7 @@ from synth_xfer._util.random import Random, Sampler
 from synth_xfer._util.solution_set import UnsizedSolutionSet
 from synth_xfer._util.synth_context import SynthesizerContext
 from synth_xfer._util.op_groups import *
+from synth_xfer._util.thompson_sample import LinearThompsonSampling
 from synth_xfer.cli.args import build_parser, get_sampler
 
 if TYPE_CHECKING:
@@ -72,46 +74,6 @@ def _setup_context(
     if not use_full_i1_ops and dsl_ops is None:
         c.use_basic_i1_ops()
     return c
-
-def distribution_to_table_string(data, headers=None):
-    if not data:
-        return "Table is empty."
-
-    # 1. Sort items
-    sorted_items = sorted(data.items(), key=lambda x: -x[1])
-
-    # 2. Format rows
-    # Column 0: The Tuple (as a string)
-    # Column 1: The Float
-    formatted_rows = []
-    for k, v in sorted_items:
-        key_str = str(k)       # Keeps the parenthesis, e.g., "('A', 'B')"
-        val_str = f"{v:.2f}"   # Standard float formatting
-        formatted_rows.append([key_str, val_str])
-    
-    # 3. Handle Headers
-    # We now know strictly that there are only 2 columns.
-    if not headers:
-        headers = ["Tuple", "Value"]
-    
-    # 4. Calculate column widths
-    widths = [len(h) for h in headers]
-    for row in formatted_rows:
-        for i, val in enumerate(row):
-            widths[i] = max(widths[i], len(val))
-
-    # 5. Build the table string
-    # Left align the tuple (col 0), Right align the float (col 1)
-    fmt = f"{{:<{widths[0]}}} | {{:>{widths[1]}}}"
-
-    lines = []
-    lines.append(fmt.format(*headers))
-    lines.append("-+-".join(["-" * w for w in widths]))
-    
-    for row in formatted_rows:
-        lines.append(fmt.format(*row))
-
-    return "\n".join(lines)
 
 def run_subset(
     domain: AbstractDomain,
@@ -169,6 +131,12 @@ def run_subset(
         contexts_weighted[subset] = _setup_context(random, False, ops)
         contexts_cond[subset] = _setup_context(random, True, ops)
 
+    # initialize Thompson sampling
+    # 7 features - bitwise, add, max, mul, shift, bitset, bitcount
+    # lambda_reg - regularization parameter for the covariance matrix
+    # v          - scaling factor for the variance (controls exploration)
+    sampler = LinearThompsonSampling(7, lambda_reg=1.0, v=1.0)
+
     start_time = perf_counter()
     init_cmp_res = solution_set.eval_improve([])[0]
     run_time = perf_counter() - start_time
@@ -183,14 +151,17 @@ def run_subset(
     current_total_rounds = total_rounds
     current_num_abd_procs = num_abd_procs
     
-    # Inital round - run each subset once to get a score
-    prev_exact = init_cmp_res.get_exact_prop()
-    subset_scores: dict[tuple[str, ...], float] = {}
-    for subset in get_name_powerset():
-        subset_scores[subset] = 0.01
-
-    s = distribution_to_table_string(subset_scores, headers=["subset", "score"])
     logger.info(s)
+
+    # record the initial exactness
+    prev_exact = init_cmp_res.get_exact_prop()
+
+    # build feature matrix
+    subsets = get_name_powerset()
+    fvecs: list[tuple[float, ...]] = []
+    for subset in subsets:
+        fvecs.append(get_feature_vector(subset))
+    feature_matrix = np.array(fvecs)
 
     for ith_iter in range(num_iters):
         iter_start = perf_counter()
@@ -203,8 +174,8 @@ def run_subset(
             num_iters - ith_iter
         )
 
-        subsets: list[tuple[str, ...]] = list(subset_scores.keys())
-        chosen_subset = random.choice_weighted(subsets, subset_scores)
+        # use linear thompson sampling to select subset
+        chosen_subset = subsets[sampler.select_arm(feature_matrix)]
         print(f"chosen_subset: {chosen_subset}")
 
         mcmc_samplers, prec_set, ranges = setup_mcmc(
@@ -234,11 +205,11 @@ def run_subset(
             vbw
         )
 
+        # Update the MAB distribution
         cmp_res = solution_set.eval_improve([])[0]
-        subset_scores[chosen_subset] = max(cmp_res.get_exact_prop() - prev_exact, 0.01)
+        sampler.update(np.array(get_feature_vector(chosen_subset)), cmp_res.get_exact_prop() - prev_exact)
         prev_exact = cmp_res.get_exact_prop()
-        
-        s = distribution_to_table_string(subset_scores, headers=["subset", "score"])
+
         logger.info(s)
         
         write_log_file(
@@ -472,7 +443,7 @@ def main() -> None:
     max_len = max(len(k) for k in vars(args))
     [logger.config(f"{k:<{max_len}} | {v}") for k, v in vars(args).items()]
 
-
+    # Run subset selection if -subs flag is used
     if (args.subs):
         print("Subset selection enabled")
         run_subset(
