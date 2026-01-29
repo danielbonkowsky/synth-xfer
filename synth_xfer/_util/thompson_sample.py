@@ -61,3 +61,13 @@ class LinearThompsonSampling:
         # to update B_inv iteratively instead of re-inverting.
         self.B_inv = np.linalg.inv(self.B)
         self.theta_hat = self.B_inv @ self.f
+    
+    def get_detailed_status(self) -> str:
+        variances = np.diag(self.B_inv)
+        
+        header = "--- LinearTS Distribution Status ---"
+        theta_str = "Theta Hat: " + " ".join([f"{x:7.3f}" for x in self.theta_hat])
+        var_str   = "Variances: " + " ".join([f"{x:7.3f}" for x in variances])
+        uncertainty = f"Total Uncertainty (Trace): {np.trace(self.B_inv):.4f}"
+        
+        return f"{header}\n{theta_str}\n{var_str}\n{uncertainty}\n"

@@ -136,6 +136,7 @@ def run_subset(
     # lambda_reg - regularization parameter for the covariance matrix
     # v          - scaling factor for the variance (controls exploration)
     sampler = LinearThompsonSampling(7, lambda_reg=1.0, v=0.2)
+    logger.info(sampler.get_detailed_status())
 
     start_time = perf_counter()
     init_cmp_res = solution_set.eval_improve([])[0]
@@ -209,6 +210,7 @@ def run_subset(
         cmp_res = solution_set.eval_improve([])[0]
         sampler.update(np.array(get_feature_vector(chosen_subset)), cmp_res.get_exact_prop() - prev_exact)
         prev_exact = cmp_res.get_exact_prop()
+        logger.info(sampler.get_detailed_status())
 
         logger.info(s)
         
