@@ -135,8 +135,8 @@ def run_subset(
     # 7 features - bitwise, add, max, mul, shift, bitset, bitcount
     # lambda_reg - regularization parameter for the covariance matrix
     # v          - scaling factor for the variance (controls exploration)
-    sampler = LinearThompsonSampling(7, lambda_reg=1.0, v=0.2)
-    logger.info(sampler.get_detailed_status())
+    thompson_sampler = LinearThompsonSampling(7, lambda_reg=1.0, v=0.2)
+    logger.info(thompson_sampler.get_detailed_status())
 
     start_time = perf_counter()
     init_cmp_res = solution_set.eval_improve([])[0]
@@ -176,7 +176,7 @@ def run_subset(
         )
 
         # use linear thompson sampling to select subset
-        chosen_subset = subsets[sampler.select_arm(feature_matrix)]
+        chosen_subset = subsets[thompson_sampler.select_arm(feature_matrix)]
         print(f"chosen_subset: {chosen_subset}")
 
         mcmc_samplers, prec_set, ranges = setup_mcmc(
@@ -208,9 +208,9 @@ def run_subset(
 
         # Update the MAB distribution
         cmp_res = solution_set.eval_improve([])[0]
-        sampler.update(np.array(get_feature_vector(chosen_subset)), cmp_res.get_exact_prop() - prev_exact)
+        thompson_sampler.update(np.array(get_feature_vector(chosen_subset)), cmp_res.get_exact_prop() - prev_exact)
         prev_exact = cmp_res.get_exact_prop()
-        logger.info(sampler.get_detailed_status())
+        logger.info(thompson_sampler.get_detailed_status())
 
         logger.info(s)
         
