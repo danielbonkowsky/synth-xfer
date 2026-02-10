@@ -77,8 +77,8 @@ def _setup_context(
 
 def run_subset(
     domain: AbstractDomain,
-    num_programs: int,
-    total_rounds: int,
+    num_mcmc: int,
+    num_steps: int,
     program_length: int,
     inv_temp: int,
     vbw: list[int],
@@ -149,7 +149,7 @@ def run_subset(
     print(s)
 
     current_prog_len = program_length
-    current_total_rounds = total_rounds
+    current_num_steps = num_steps
     current_num_abd_procs = num_abd_procs
     
     logger.info(s)
@@ -168,7 +168,7 @@ def run_subset(
         iter_start = perf_counter()
         # gradually increase the program length
         current_prog_len += (program_length - current_prog_len) // (num_iters - ith_iter)
-        current_total_rounds += (total_rounds - current_total_rounds) // (
+        current_num_steps += (num_steps - current_num_steps) // (
             num_iters - ith_iter
         )
         current_num_abd_procs += (num_abd_procs - current_num_abd_procs) // (
@@ -183,12 +183,12 @@ def run_subset(
             helper_funcs.transfer_func,
             solution_set.precise_set,
             current_num_abd_procs,
-            num_programs,
+            num_mcmc,
             contexts[chosen_subset],
             contexts_weighted[chosen_subset],
             contexts_cond[chosen_subset],
             current_prog_len,
-            current_total_rounds,
+            current_num_steps,
             condition_length,
         )
 
@@ -268,8 +268,8 @@ def run_subset(
 
 def run(
     domain: AbstractDomain,
-    num_programs: int,
-    total_rounds: int,
+    num_mcmc: int,
+    num_steps: int,
     program_length: int,
     inv_temp: int,
     vbw: list[int],
@@ -329,15 +329,13 @@ def run(
     print(s)
 
     current_prog_len = program_length
-    current_total_rounds = total_rounds
+    current_num_steps = num_steps
     current_num_abd_procs = num_abd_procs
     for ith_iter in range(num_iters):
         iter_start = perf_counter()
         # gradually increase the program length
         current_prog_len += (program_length - current_prog_len) // (num_iters - ith_iter)
-        current_total_rounds += (total_rounds - current_total_rounds) // (
-            num_iters - ith_iter
-        )
+        current_num_steps += (num_steps - current_num_steps) // (num_iters - ith_iter)
         current_num_abd_procs += (num_abd_procs - current_num_abd_procs) // (
             num_iters - ith_iter
         )
@@ -351,12 +349,12 @@ def run(
             helper_funcs.transfer_func,
             solution_set.precise_set,
             current_num_abd_procs,
-            num_programs,
+            num_mcmc,
             context,
             context_weighted,
             context_cond,
             current_prog_len,
-            current_total_rounds,
+            current_num_steps,
             condition_length,
         )
 
@@ -429,7 +427,7 @@ def main() -> None:
     args = build_parser("synth_xfer")
 
     domain = AbstractDomain[args.domain]
-    op_path = Path(args.transfer_functions)
+    op_path = Path(args.transfer_function)
 
     if args.output is None:
         outputs_folder = Path(f"{domain}_{op_path.stem}")
@@ -450,8 +448,8 @@ def main() -> None:
         print("Subset selection enabled")
         run_subset(
             domain=domain,
-            num_programs=args.num_programs,
-            total_rounds=args.total_rounds,
+            num_mcmc=args.num_mcmc,
+            num_steps=args.num_steps,
             program_length=args.program_length,
             inv_temp=args.inv_temp,
             vbw=args.vbw,
@@ -472,8 +470,8 @@ def main() -> None:
     else:
         run(
             domain=domain,
-            num_programs=args.num_programs,
-            total_rounds=args.total_rounds,
+            num_mcmc=args.num_mcmc,
+            num_steps=args.num_steps,
             program_length=args.program_length,
             inv_temp=args.inv_temp,
             vbw=args.vbw,
