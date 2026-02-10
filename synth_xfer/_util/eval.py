@@ -1,3 +1,4 @@
+import re
 from typing import TYPE_CHECKING, Callable
 
 from xdsl.parser import IntegerType
@@ -154,6 +155,9 @@ def eval_transfer_func(
 ) -> list[EvalResult]:
     def get_eval_f(x: "ToEval") -> Callable[["ToEval", list[int], list[int]], "Results"]:
         suffix = x.__class__.__name__.lower()[6:]
+        # C++ registers eval as "eval_<domain>_<n>_<n>_..."; ensure underscore
+        # before digits after the domain (e.g. knownbits8_8_8 -> knownbits_8_8_8)
+        suffix = re.sub(r"([a-z])(\d)", r"\1_\2", suffix)
         func_name = f"eval_{suffix}"
 
         try:
