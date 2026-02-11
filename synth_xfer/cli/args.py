@@ -318,7 +318,7 @@ def build_parser(prog: str) -> Namespace:
     )
     p.add_argument("-q", "--quiet", action="store_true")
     p.add_argument(
-        "-subs",
+        "--subs",
         action=BooleanOptionalAction,
         default=False,
         help="Enable or disable subset selection",
