@@ -177,6 +177,7 @@ def run_subset(
 
         # use linear thompson sampling to select subset
         chosen_subset = subsets[thompson_sampler.select_arm(feature_matrix)]
+        logger.info(f"chosen_subset: {chosen_subset}")
         print(f"chosen_subset: {chosen_subset}")
 
         mcmc_samplers, prec_set, ranges = setup_mcmc(
@@ -207,6 +208,7 @@ def run_subset(
         )
 
         print(f'actual subset: {actual_subset}')
+        logger.info(f'actual subset: {actual_subset}')
 
         # Update the MAB distribution
         cmp_res = solution_set.eval_improve([])[0]
