@@ -135,7 +135,7 @@ def run_subset(
     # 7 features - bitwise, add, max, mul, shift, bitset, bitcount
     # lambda_reg - regularization parameter for the covariance matrix
     # v          - scaling factor for the variance (controls exploration)
-    thompson_sampler = LinearThompsonSampling(7, lambda_reg=1.0, v=0.2)
+    thompson_sampler = LinearThompsonSampling(7, lambda_reg=1.0, v=1.618)
     logger.info(thompson_sampler.get_detailed_status())
 
     start_time = perf_counter()
