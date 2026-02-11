@@ -317,9 +317,10 @@ class UnsizedSolutionSet(SolutionSet):
             self.solutions.append(cand_to_be_added)
 
             if cand in new_candidates:
+                dce_cand = FunctionWithCondition(dce(cand_to_be_added.func), cand_to_be_added.cond)
                 ops_used: set[type[Operation]] = set()
 
-                for op in cand_to_be_added.func.body.block.ops:
+                for op in dce_cand.func.body.block.ops:
                     ops_used.add(type(op))
 
                 print(f'ops_used: {ops_used}')
