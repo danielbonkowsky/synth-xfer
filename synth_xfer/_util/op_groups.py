@@ -1,6 +1,7 @@
 from itertools import chain, combinations
 import xdsl.dialects.arith as arith
 from synth_xfer._util.dsl_operators import DslOpSet, BOOL_T, INT_T
+from xdsl.ir import Operation
 from xdsl_smt.dialects.transfer import (
     AbstractValueType,
     AddOp,
@@ -144,3 +145,25 @@ def get_full_powerset() -> dict[tuple[str, ...], DslOpSet]:
         ps[subset] = ops
     
     return ps
+
+def op_list_to_subset(ops: list[type[Operation]]) -> list[str]:
+    """ take a list of operations and return the subset that subsume those ops """
+
+    subset = []
+    for op in ops:
+        if op in op_groups['bitwise'][INT_T]:
+            subset.append('bitwise')
+        elif op in op_groups['add'][INT_T]:
+            subset.append('add')
+        elif op in op_groups['max'][INT_T]:
+            subset.append('max')
+        elif op in op_groups['mul'][INT_T]:
+            subset.append('mul')
+        elif op in op_groups['shift'][INT_T]:
+            subset.append('shift')
+        elif op in op_groups['bitset'][INT_T]:
+            subset.append('bitset')
+        elif op in op_groups['bitcount'][INT_T]:
+            subset.append('bitcount')
+    
+    return list(set(subset))

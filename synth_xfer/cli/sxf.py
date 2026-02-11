@@ -192,7 +192,7 @@ def run_subset(
             condition_length,
         )
 
-        solution_set = synthesize_one_iteration(
+        solution_set, actual_subset = synthesize_one_iteration(
             ith_iter,
             random,
             solution_set,
@@ -206,9 +206,11 @@ def run_subset(
             vbw
         )
 
+        print(f'actual subset: {actual_subset}')
+
         # Update the MAB distribution
         cmp_res = solution_set.eval_improve([])[0]
-        thompson_sampler.update(np.array(get_feature_vector(chosen_subset)), cmp_res.get_exact_prop() - prev_exact)
+        thompson_sampler.update(np.array(get_feature_vector(actual_subset)), cmp_res.get_exact_prop() - prev_exact)
         prev_exact = cmp_res.get_exact_prop()
         logger.info(thompson_sampler.get_detailed_status())
 

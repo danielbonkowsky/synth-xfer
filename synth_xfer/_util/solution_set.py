@@ -6,6 +6,7 @@ from typing import Callable
 
 from xdsl.dialects.builtin import ModuleOp
 from xdsl.dialects.func import CallOp, FuncOp, ReturnOp
+from xdsl.ir import Operation
 
 from synth_xfer._util.cond_func import FunctionWithCondition
 from synth_xfer._util.dce import dce
@@ -13,6 +14,7 @@ from synth_xfer._util.eval_result import EvalResult
 from synth_xfer._util.log import get_logger, write_log_file
 from synth_xfer._util.parse_mlir import HelperFuncs
 from synth_xfer._util.synth_context import SynthesizerContext
+from synth_xfer._util.op_groups import op_list_to_subset
 from synth_xfer.cli.verify import verify_function
 from synth_xfer.egraph_rewriter.rewriter import rewrite_single_function
 
@@ -75,7 +77,7 @@ class SolutionSet(ABC):
         # Parameters used by SMT verifier
         helper_funcs: HelperFuncs,
         num_unsound_candidates: int,
-    ) -> SolutionSet: ...
+    ) -> tuple[SolutionSet, tuple[str, ...]]: ...
 
     def has_solution(self) -> bool:
         return self.solutions_size != 0
@@ -194,10 +196,13 @@ class UnsizedSolutionSet(SolutionSet):
         new_candidates_c: list[FunctionWithCondition],
         helper_funcs: HelperFuncs,
         num_unsound_candidates: int,
-    ) -> SolutionSet:
+    ) -> tuple[SolutionSet, tuple[str, ...]]:
         logger = get_logger()
         candidates = self.solutions + new_candidates_sp + new_candidates_c
+        new_candidates = new_candidates_sp + new_candidates_c  # new candidates to do better subset selection
+
         _rename_functions(candidates, "part_solution_")
+        # _rename_functions(new_candidates, "part_solution_")    # also renaming new candidates for consistency
 
         logger.info(f"Size of new candidates: {len(new_candidates_sp)}")
         logger.info(f"Size of new conditional candidates: {len(new_candidates_c)}")
@@ -206,6 +211,7 @@ class UnsizedSolutionSet(SolutionSet):
 
         self.solutions = []
         num_cond_solutions = 0
+        subset_used = []
 
         while len(candidates) > 0:
             result = self.eval_improve(candidates)
@@ -310,6 +316,15 @@ class UnsizedSolutionSet(SolutionSet):
             candidates.remove(cand)
             self.solutions.append(cand_to_be_added)
 
+            if cand in new_candidates:
+                ops_used: set[type[Operation]] = set()
+
+                for op in cand_to_be_added.func.body.block.ops:
+                    ops_used.add(type(op))
+
+                print(f'ops_used: {ops_used}')
+                subset_used += op_list_to_subset(list(ops_used))
+
         logger.info(f"The number of solutions after reseting: {len(self.solutions)}")
         logger.info(f"The number of conditional solutions: {num_cond_solutions}")
         self.solutions_size = len(self.solutions)
@@ -341,7 +356,7 @@ class UnsizedSolutionSet(SolutionSet):
             )
             self.precise_set.append(cand)
 
-        return self
+        return (self, tuple(set(subset_used)))
 
     def learn_weights(self, context: SynthesizerContext):
         "Set weights in context according to the frequencies of each DSL operation that appear in func in solution set"

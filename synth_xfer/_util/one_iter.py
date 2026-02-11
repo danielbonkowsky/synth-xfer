@@ -58,7 +58,7 @@ def synthesize_one_iteration(
     prec_set: list[FuncOp],
     lbw: list[int],
     vbw: list[int],
-) -> SolutionSet:
+) -> tuple[SolutionSet, tuple[str, ...]]:
     "Given ith_iter, performs num_steps mcmc sampling"
 
     iter_start_time = perf_counter()
@@ -191,7 +191,7 @@ def synthesize_one_iteration(
             )
 
     verif_start_time = perf_counter()
-    new_solution_set = solution_set.construct_new_solution_set(
+    new_solution_set, subset_used = solution_set.construct_new_solution_set(
         lbw,
         vbw,
         candidates_sp,
@@ -212,4 +212,4 @@ def synthesize_one_iteration(
     logger.perf("\tDeciding took | " + perf_str(decide_total))
     logger.perf("\tVerif took    | " + perf_str(verif_time))
 
-    return new_solution_set
+    return (new_solution_set, subset_used)
